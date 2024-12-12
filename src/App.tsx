@@ -4,10 +4,12 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/lib/AuthContext";
+import { AnimatePresence } from "framer-motion";
 import Index from "./pages/Index";
 import SignInForm from "./components/auth/SignInForm";
 import SignUpForm from "./components/auth/SignUpForm";
 import Dashboard from "./pages/Dashboard";
+import GenerateQuiz from "./pages/GenerateQuiz";
 
 const queryClient = new QueryClient();
 
@@ -18,12 +20,15 @@ const App = () => (
         <AuthProvider>
           <Toaster />
           <Sonner />
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/sign-in" element={<SignInForm />} />
-            <Route path="/sign-up" element={<SignUpForm />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-          </Routes>
+          <AnimatePresence mode="wait">
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/sign-in" element={<SignInForm />} />
+              <Route path="/sign-up" element={<SignUpForm />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/generate" element={<GenerateQuiz />} />
+            </Routes>
+          </AnimatePresence>
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>

@@ -64,4 +64,29 @@
            focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent
            transition-all duration-200;
   }
+
+  /* Add these styles to your existing CSS */
+  .page-transition-wrapper {
+    position: relative;
+    min-height: 100vh;
+  }
+
+  /* Prevent content jumping during transitions */
+  .layout-container {
+    position: relative;
+    width: 100%;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 1rem;
+  }
+}
+
+@layer utilities {
+  .glass-card {
+    @apply bg-white/10 backdrop-blur-md border border-white/20 shadow-lg;
+  }
+
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent;
+  }
 }
