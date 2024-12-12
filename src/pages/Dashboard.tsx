@@ -2,9 +2,10 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/AuthContext";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 const Dashboard = () => {
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -18,8 +19,11 @@ const Dashboard = () => {
   return (
     <div className="container mx-auto p-6">
       <Card>
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Welcome to your Dashboard</CardTitle>
+          <Button variant="outline" onClick={signOut}>
+            Sign Out
+          </Button>
         </CardHeader>
         <CardContent>
           <p className="text-gray-600">Logged in as: {user.email}</p>

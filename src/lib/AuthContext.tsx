@@ -24,6 +24,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
+      if (session) {
+        navigate("/dashboard");
+      }
     });
 
     // Listen for auth changes
@@ -35,8 +38,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       
       if (session) {
         navigate("/dashboard");
-      } else {
-        navigate("/sign-in");
       }
     });
 
@@ -51,6 +52,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
       if (error) throw error;
       toast.success("Successfully signed in!");
+      navigate("/dashboard");
     } catch (error: any) {
       toast.error(error.message);
       throw error;
@@ -65,6 +67,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
       if (error) throw error;
       toast.success("Successfully signed up! Please check your email for verification.");
+      navigate("/dashboard");
     } catch (error: any) {
       toast.error(error.message);
       throw error;
@@ -76,6 +79,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
       toast.success("Successfully signed out!");
+      navigate("/sign-in");
     } catch (error: any) {
       toast.error(error.message);
       throw error;
