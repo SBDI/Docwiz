@@ -1,5 +1,4 @@
 import React from 'react';
-import { Button } from '@/components/ui/button';
 
 interface Props {
   children: React.ReactNode;
@@ -7,25 +6,28 @@ interface Props {
 
 interface State {
   hasError: boolean;
+  error?: Error;
 }
 
 class ErrorBoundary extends React.Component<Props, State> {
-  public state: State = {
-    hasError: false
-  };
-
-  public static getDerivedStateFromError(): State {
-    return { hasError: true };
+  constructor(props: Props) {
+    super(props);
+    this.state = { hasError: false };
   }
 
-  public render() {
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+
+  render() {
     if (this.state.hasError) {
       return (
-        <div className="flex flex-col items-center justify-center h-screen">
-          <h2 className="text-2xl font-bold mb-4">Something went wrong</h2>
-          <Button onClick={() => window.location.reload()}>
-            Refresh Page
-          </Button>
+        <div className="p-4 bg-red-50 text-red-700 rounded-lg">
+          <h2>Something went wrong.</h2>
+          <details className="mt-2">
+            <summary>Error details</summary>
+            <pre className="mt-2 text-sm">{this.state.error?.message}</pre>
+          </details>
         </div>
       );
     }

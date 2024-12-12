@@ -1,37 +1,68 @@
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
-import NeuralBackground from "@/components/NeuralBackground";
-import { ArrowRight, CheckCircle2 } from "lucide-react";
+import NeuralBackground from "@/components/ui/neural-background";
+
+const PricingTier = ({ name, price, features, recommended = false }) => (
+  <div className={`relative bg-white/50 backdrop-blur-sm p-8 rounded-2xl border ${recommended ? 'border-indigo-500 shadow-lg' : 'border-gray-200'}`}>
+    {recommended && (
+      <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-indigo-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+        Recommended
+      </div>
+    )}
+    <h3 className="text-xl font-semibold mb-2">{name}</h3>
+    <div className="mb-6">
+      <span className="text-4xl font-bold">${price}</span>
+      <span className="text-gray-500">/month</span>
+    </div>
+    <ul className="space-y-3 mb-8">
+      {features.map((feature, index) => (
+        <li key={index} className="flex items-center text-gray-600">
+          <svg className="w-5 h-5 text-indigo-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+          </svg>
+          {feature}
+        </li>
+      ))}
+    </ul>
+    <Button 
+      size="lg" 
+      variant={recommended ? "default" : "outline"} 
+      className="w-full rounded-full"
+      asChild
+    >
+      <Link to="/sign-up">Get Started</Link>
+    </Button>
+  </div>
+);
 
 const Index = () => {
-  const navigate = useNavigate();
-
   return (
-    <>
+    <div className="relative min-h-screen overflow-hidden">
       <NeuralBackground />
-      <div className="min-h-screen flex flex-col items-center relative">
-        {/* Hero Section */}
+      
+      {/* Hero Section */}
+      <div className="relative container mx-auto px-4 pt-20 pb-16 sm:pt-32">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="text-center max-w-3xl px-6 mt-20"
+          className="text-center max-w-3xl mx-auto"
         >
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2 }}
-            className="inline-block mb-6 px-4 py-1.5 bg-primary/10 text-primary rounded-full text-sm font-medium"
+            className="inline-block mb-6 px-4 py-1.5 bg-indigo-500/10 text-indigo-600 rounded-full text-sm font-medium"
           >
-            Introducing DocWiz
+            ✨ Introducing Docwiz
           </motion.div>
           
           <motion.h1 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4 }}
-            className="text-5xl font-bold mb-6 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent"
+            className="text-4xl sm:text-6xl font-bold mb-8 bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600"
           >
             Transform Documents into Smart Quizzes Instantly
           </motion.h1>
@@ -40,7 +71,7 @@ const Index = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.6 }}
-            className="text-xl text-gray-300 mb-12"
+            className="text-xl text-gray-600 mb-12 max-w-2xl mx-auto"
           >
             Upload any document and let AI create engaging quizzes automatically.
             Perfect for educators, trainers, and content creators.
@@ -50,182 +81,133 @@ const Index = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.8 }}
-            className="space-x-4"
+            className="flex flex-col sm:flex-row gap-4 justify-center"
           >
-            <Button
-              onClick={() => navigate("/sign-up")}
-              className="button-primary text-lg px-8 py-4"
-            >
-              Start Converting <ArrowRight className="ml-2" />
+            <Button size="lg" asChild className="rounded-full">
+              <Link to="/sign-up">Get Started Free</Link>
             </Button>
-            <Button
-              onClick={() => navigate("/sign-in")}
-              variant="outline"
-              className="text-lg px-8 py-4 border-primary text-primary hover:bg-primary/10"
-            >
-              Sign In
+            <Button size="lg" variant="outline" asChild className="rounded-full">
+              <Link to="/templates">View Templates</Link>
             </Button>
           </motion.div>
         </motion.div>
-
-        {/* Features Grid */}
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1 }}
-          className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8 px-6 max-w-5xl"
-        >
-          {features.map((feature, index) => (
-            <motion.div
-              key={feature.title}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.2 + index * 0.2 }}
-              className="glass-card p-6 rounded-xl hover-lift"
-            >
-              <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
-                {feature.icon}
-              </div>
-              <h3 className="text-xl font-semibold mb-2 text-gray-100">{feature.title}</h3>
-              <p className="text-gray-300">{feature.description}</p>
-            </motion.div>
-          ))}
-        </motion.div>
-
-        {/* How It Works Section */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.4 }}
-          className="mt-32 px-6 max-w-5xl w-full"
-        >
-          <h2 className="text-3xl font-bold text-center mb-12 text-gray-100">How DocWiz Works</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {steps.map((step, index) => (
-              <div key={step.title} className="flex flex-col items-center text-center">
-                <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center mb-4 text-primary font-bold">
-                  {index + 1}
-                </div>
-                <h3 className="text-xl font-semibold mb-2 text-gray-100">{step.title}</h3>
-                <p className="text-gray-300">{step.description}</p>
-              </div>
-            ))}
-          </div>
-        </motion.div>
-
-        {/* Pricing Section */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.6 }}
-          className="mt-32 px-6 max-w-5xl w-full"
-        >
-          <h2 className="text-3xl font-bold text-center mb-12 text-gray-100">Simple, Transparent Pricing</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 justify-center">
-            {pricingPlans.map((plan) => (
-              <div key={plan.title} className="glass-card p-8 rounded-xl">
-                <h3 className="text-2xl font-bold mb-4 text-gray-100">{plan.title}</h3>
-                <div className="mb-6">
-                  <span className="text-4xl font-bold text-primary">${plan.price}</span>
-                  <span className="text-gray-300">/month</span>
-                </div>
-                <ul className="space-y-4 mb-8">
-                  {plan.features.map((feature) => (
-                    <li key={feature} className="flex items-center text-gray-300">
-                      <CheckCircle2 className="w-5 h-5 text-primary mr-2" />
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-                <Button 
-                  onClick={() => navigate("/sign-up")}
-                  className={plan.recommended ? "w-full button-primary" : "w-full"}
-                  variant={plan.recommended ? "default" : "outline"}
-                >
-                  Get Started
-                </Button>
-              </div>
-            ))}
-          </div>
-        </motion.div>
-
-        {/* Footer */}
-        <motion.footer
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.8 }}
-          className="mt-32 mb-8 text-center text-gray-400"
-        >
-          <p>© 2024 DocWiz. All rights reserved.</p>
-        </motion.footer>
       </div>
-    </>
+
+      {/* Features Grid */}
+      <motion.div
+        initial={{ opacity: 0, y: 40 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1, duration: 0.8 }}
+        className="relative container mx-auto px-4 py-16"
+      >
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-200">
+            <div className="w-12 h-12 bg-indigo-500/10 rounded-xl flex items-center justify-center mb-4">
+              <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+            </div>
+            <h3 className="text-xl font-semibold mb-2">Lightning Fast</h3>
+            <p className="text-gray-600">Generate comprehensive quizzes in seconds with our advanced AI technology.</p>
+          </div>
+
+          <div className="bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-200">
+            <div className="w-12 h-12 bg-purple-500/10 rounded-xl flex items-center justify-center mb-4">
+              <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <h3 className="text-xl font-semibold mb-2">Smart Analysis</h3>
+            <p className="text-gray-600">Our AI understands context and generates relevant, challenging questions.</p>
+          </div>
+
+          <div className="bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-200">
+            <div className="w-12 h-12 bg-pink-500/10 rounded-xl flex items-center justify-center mb-4">
+              <svg className="w-6 h-6 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
+              </svg>
+            </div>
+            <h3 className="text-xl font-semibold mb-2">Multiple Formats</h3>
+            <p className="text-gray-600">Support for PDFs, docs, images, and more. Create quizzes from any content.</p>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Pricing Section */}
+      <motion.div
+        initial={{ opacity: 0, y: 40 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1.4, duration: 0.8 }}
+        className="relative container mx-auto px-4 py-16"
+      >
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-bold mb-4">Simple, Transparent Pricing</h2>
+          <p className="text-gray-600 max-w-2xl mx-auto">
+            Choose the perfect plan for your needs. All plans include core features.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+          <PricingTier
+            name="Basic"
+            price={0}
+            features={[
+              "5 quizzes per month",
+              "Basic question types",
+              "PDF & Text support",
+              "Email support"
+            ]}
+          />
+          <PricingTier
+            name="Pro"
+            price={29}
+            features={[
+              "Unlimited quizzes",
+              "All question types",
+              "All file formats",
+              "Priority support",
+              "Custom branding"
+            ]}
+            recommended={true}
+          />
+          <PricingTier
+            name="Enterprise"
+            price={99}
+            features={[
+              "Everything in Pro",
+              "Custom integrations",
+              "Team management",
+              "Advanced analytics",
+              "24/7 phone support"
+            ]}
+          />
+        </div>
+
+        <div className="text-center mt-12">
+          <p className="text-sm text-gray-500">
+            All plans include a 14-day free trial. No credit card required.
+          </p>
+        </div>
+      </motion.div>
+
+      {/* Social Proof */}
+      <div className="relative container mx-auto px-4 py-16">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.2 }}
+          className="text-center"
+        >
+          <p className="text-sm font-medium text-gray-500 mb-4">TRUSTED BY EDUCATORS WORLDWIDE</p>
+          <div className="flex justify-center items-center gap-8 opacity-50">
+            <img src="/logos/harvard.svg" alt="University Logo" className="h-8" />
+            <img src="/logos/stanford.svg" alt="University Logo" className="h-8" />
+            <img src="/logos/mit.svg" alt="University Logo" className="h-8" />
+          </div>
+        </motion.div>
+      </div>
+    </div>
   );
 };
-
-const features = [
-  {
-    title: "Smart Document Analysis",
-    description: "Upload PDFs, docs, or paste text. Our AI extracts key concepts automatically.",
-    icon: <svg className="w-6 h-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-    </svg>
-  },
-  {
-    title: "AI Question Generation",
-    description: "Advanced algorithms create diverse question types: multiple choice, true/false, and more.",
-    icon: <svg className="w-6 h-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-    </svg>
-  },
-  {
-    title: "Instant Quiz Export",
-    description: "Download quizzes in multiple formats or share them directly with your team.",
-    icon: <svg className="w-6 h-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-    </svg>
-  }
-];
-
-const steps = [
-  {
-    title: "Upload Document",
-    description: "Upload any document format or paste your text directly into DocWiz."
-  },
-  {
-    title: "AI Processing",
-    description: "Our AI analyzes the content and identifies key concepts and learning points."
-  },
-  {
-    title: "Get Your Quiz",
-    description: "Receive a professionally formatted quiz ready to use or customize."
-  }
-];
-
-const pricingPlans = [
-  {
-    title: "Free",
-    price: "0",
-    features: [
-      "5 quizzes per month",
-      "Basic question types",
-      "PDF export",
-      "Email support"
-    ]
-  },
-  {
-    title: "Pro",
-    price: "29",
-    recommended: true,
-    features: [
-      "Unlimited quizzes",
-      "Advanced question types",
-      "All export formats",
-      "Priority support",
-      "Custom branding",
-      "Analytics dashboard"
-    ]
-  }
-];
 
 export default Index;

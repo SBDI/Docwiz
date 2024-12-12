@@ -1,137 +1,178 @@
-import { useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import { useAuth } from "@/lib/AuthContext";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { LoadingSpinner } from "@/components/ui/loading";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useState, useEffect } from 'react';
+import { useAuth } from '@/lib/AuthContext';
+import { supabase } from '@/lib/supabase';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Link } from 'react-router-dom';
 
-// Mock data for recent quizzes
-const mockRecentQuizzes = [
-  { id: 1, name: "Biology Quiz", source: "Text Input", date: "2024-01-12" },
-  { id: 2, name: "History Test", source: "Document", date: "2024-01-11" },
-  { id: 3, name: "Physics Quiz", source: "Web Link", date: "2024-01-10" },
-];
-
-// Mock subscription data (replace with actual data later)
-const mockSubscription = {
-  type: "Free Plan",
-  credits: 100,
-};
+interface QuizHistory {
+  id: string;
+  createdAt: string;
+  title: string;
+  questionsCount: number;
+  status: 'completed' | 'failed';
+}
 
 const Dashboard = () => {
-  const { user, signOut } = useAuth();
-  const navigate = useNavigate();
+  const { user } = useAuth();
+  const [quizHistory, setQuizHistory] = useState<QuizHistory[]>([]);
+  const [credits, setCredits] = useState(0);
 
   useEffect(() => {
-    if (!user) {
-      navigate("/sign-in");
+    if (user) {
+      fetchQuizHistory();
+      fetchCredits();
     }
-  }, [user, navigate]);
+  }, [user]);
 
-  if (!user) return null;
+  const fetchQuizHistory = async () => {
+    const { data, error } = await supabase
+      .from('quiz_history')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching quiz history:', error);
+      return;
+    }
+
+    setQuizHistory(data);
+  };
+
+  const fetchCredits = async () => {
+    const { data, error } = await supabase
+      .from('users')
+      .select('credits')
+      .eq('id', user.id)
+      .single();
+
+    if (error) {
+      console.error('Error fetching credits:', error);
+      return;
+    }
+
+    setCredits(data.credits);
+  };
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      {/* Header Section */}
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <div>
-            <CardTitle className="text-2xl">Welcome to your Dashboard</CardTitle>
-            <p className="text-gray-600 mt-1">Logged in as: {user.email}</p>
-          </div>
-          <Button variant="outline" onClick={signOut}>
-            Sign Out
-          </Button>
-        </CardHeader>
-      </Card>
+    <div className="container mx-auto p-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Credits Card */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Available Credits</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold text-indigo-600">{credits}</div>
+            <p className="text-sm text-gray-500 mt-1">Credits remaining</p>
+            <Button className="w-full mt-4" asChild>
+              <Link to="/credits">Get More Credits</Link>
+            </Button>
+          </CardContent>
+        </Card>
 
-      {/* Main Content Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {/* Quick Actions Section */}
+        {/* Quick Actions */}
         <Card>
           <CardHeader>
             <CardTitle>Quick Actions</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <Button className="w-full" asChild>
-              <Link to="/generate">Generate New Quiz</Link>
+              <Link to="/create">Create New Quiz</Link>
             </Button>
-            <Button className="w-full" variant="secondary" asChild>
-              <Link to="/history">View Quiz History</Link>
-            </Button>
-            <Button className="w-full" variant="outline" asChild>
-              <Link to="/credits">Manage Credits</Link>
+            <Button variant="outline" className="w-full" asChild>
+              <Link to="/history">View All Quizzes</Link>
             </Button>
           </CardContent>
         </Card>
 
-        {/* Recent Activity Section */}
+        {/* Stats Card */}
         <Card>
           <CardHeader>
-            <CardTitle>Recent Activity</CardTitle>
+            <CardTitle>Statistics</CardTitle>
           </CardHeader>
           <CardContent>
-            {mockRecentQuizzes.length > 0 ? (
-              <div className="space-y-4">
-                {mockRecentQuizzes.map((quiz) => (
-                  <div
-                    key={quiz.id}
-                    className="flex items-center justify-between p-3 bg-muted rounded-lg"
-                  >
-                    <div>
-                      <h4 className="font-medium">{quiz.name}</h4>
-                      <p className="text-sm text-gray-600">
-                        Source: {quiz.source}
-                      </p>
-                      <p className="text-sm text-gray-600">Date: {quiz.date}</p>
-                    </div>
-                    <Button variant="ghost" size="sm" asChild>
-                      <Link to={`/quiz/${quiz.id}`}>View</Link>
-                    </Button>
-                  </div>
-                ))}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <div className="text-2xl font-bold">{quizHistory.length}</div>
+                <div className="text-sm text-gray-500">Total Quizzes</div>
               </div>
-            ) : (
-              <p className="text-gray-600">No recent quizzes</p>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Subscription Status Section */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Subscription & Credits</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <p className="font-medium">Current Plan</p>
-              <div className="flex items-center justify-between bg-muted p-3 rounded-lg">
-                <span>{mockSubscription.type}</span>
-                <Button variant="outline" size="sm" asChild>
-                  <Link to="/credits">Upgrade</Link>
-                </Button>
+              <div>
+                <div className="text-2xl font-bold">
+                  {quizHistory.filter(q => q.status === 'completed').length}
+                </div>
+                <div className="text-sm text-gray-500">Completed</div>
               </div>
             </div>
-            
-            <div className="space-y-2">
-              <p className="font-medium">Credit Balance</p>
-              <div className="bg-muted p-3 rounded-lg">
-                <span className="text-xl font-bold">{mockSubscription.credits}</span>
-                <span className="text-gray-600 ml-2">credits remaining</span>
-              </div>
-            </div>
-
-            {mockSubscription.type === "Free Plan" && (
-              <Alert>
-                <AlertDescription>
-                  Upgrade your plan to get more credits and unlock premium features!
-                </AlertDescription>
-              </Alert>
-            )}
           </CardContent>
         </Card>
       </div>
+
+      {/* Recent Quizzes */}
+      <Card className="mt-6">
+        <CardHeader>
+          <div className="flex justify-between items-center">
+            <CardTitle>Recent Quizzes</CardTitle>
+            <Button variant="outline" size="sm" asChild>
+              <Link to="/history">View All</Link>
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {quizHistory.length === 0 ? (
+              <div className="text-center py-8 text-gray-500">
+                <p>No quizzes yet. Create your first quiz!</p>
+                <Button className="mt-4" asChild>
+                  <Link to="/create">Create Quiz</Link>
+                </Button>
+              </div>
+            ) : (
+              quizHistory.slice(0, 5).map((quiz) => (
+                <div 
+                  key={quiz.id} 
+                  className="flex justify-between items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                >
+                  <div>
+                    <h4 className="font-medium">{quiz.title}</h4>
+                    <p className="text-sm text-gray-600">
+                      {new Date(quiz.createdAt).toLocaleDateString()}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <span className="text-sm text-gray-600">
+                      {quiz.questionsCount} questions
+                    </span>
+                    <Button size="sm" variant="outline" asChild>
+                      <Link to={`/quiz/${quiz.id}`}>View</Link>
+                    </Button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Subscription Banner */}
+      <Card className="mt-6 bg-gradient-to-r from-indigo-500 to-purple-500 text-white">
+        <CardContent className="py-6">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <div>
+              <h3 className="text-xl font-semibold">Upgrade to Pro</h3>
+              <p className="text-indigo-100">Get unlimited quizzes and advanced features</p>
+            </div>
+            <Button 
+              variant="secondary" 
+              className="bg-white text-indigo-600 hover:bg-indigo-50"
+              asChild
+            >
+              <Link to="/pricing">View Plans</Link>
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
