@@ -3,10 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { motion } from "framer-motion";
-import { toast } from "sonner";
+import { useAuth } from "@/lib/AuthContext";
 
 const SignInForm = () => {
   const navigate = useNavigate();
+  const { signIn } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -16,11 +17,9 @@ const SignInForm = () => {
     setLoading(true);
 
     try {
-      // TODO: Implement Supabase auth
-      toast.success("Successfully signed in!");
-      navigate("/dashboard");
+      await signIn(email, password);
     } catch (error) {
-      toast.error("Failed to sign in. Please try again.");
+      // Error is handled in the auth context
     } finally {
       setLoading(false);
     }
