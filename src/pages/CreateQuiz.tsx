@@ -183,6 +183,29 @@ const CreateQuiz = () => {
 
     const containerClasses = "flex flex-col items-center justify-center min-h-[400px] border-2 border-dashed border-[#E2E8F0] rounded-lg p-8 bg-[#F8FAFC]";
     
+    const renderGenerateButton = () => (
+      <div className="flex justify-between items-center mt-6">
+        <Button 
+          className="bg-blue-600 hover:bg-blue-700 text-white rounded-full px-8"
+          onClick={handleSubmit}
+          disabled={
+            isLoading || 
+            (activeTab === 'text' && characterCount === 0) ||
+            (activeTab === 'video' && !urlInput) ||
+            (activeTab === 'webpage' && !urlInput) ||
+            ((activeTab === 'document' || activeTab === 'image') && !parsedContent)
+          }
+        >
+          {isLoading ? "Generating..." : "Generate Quiz"}
+        </Button>
+        {activeTab === 'text' && (
+          <span className="text-[#64748B] text-sm">
+            {characterCount}/20,000 characters
+          </span>
+        )}
+      </div>
+    );
+
     switch (activeTab) {
       case 'text':
         return (
@@ -197,17 +220,7 @@ const CreateQuiz = () => {
                 />
               </div>
             </div>
-            <div className="flex justify-between items-center">
-              <Button 
-                className="bg-blue-600 hover:bg-blue-700 text-white rounded-full px-8"
-                disabled={characterCount === 0}
-              >
-                Generate
-              </Button>
-              <span className="text-[#64748B] text-sm">
-                {characterCount}/20,000 characters
-              </span>
-            </div>
+            {renderGenerateButton()}
           </div>
         );
 
@@ -245,14 +258,7 @@ const CreateQuiz = () => {
                 </div>
               </div>
             </div>
-            <div className="flex justify-center">
-              <Button 
-                className="bg-blue-600 hover:bg-blue-700 text-white rounded-full px-8"
-                disabled={!urlInput}
-              >
-                Generate
-              </Button>
-            </div>
+            {renderGenerateButton()}
           </div>
         );
 
@@ -290,14 +296,7 @@ const CreateQuiz = () => {
                 </div>
               </div>
             </div>
-            <div className="flex justify-center">
-              <Button 
-                className="bg-blue-600 hover:bg-blue-700 text-white rounded-full px-8"
-                disabled={!urlInput}
-              >
-                Generate
-              </Button>
-            </div>
+            {renderGenerateButton()}
           </div>
         );
 
@@ -356,7 +355,6 @@ const CreateQuiz = () => {
             </div>
             
             {parsedContent && !showPageSelection && (
-              <>
                 <div className="mt-4">
                   <h3 className="text-lg font-semibold mb-2">Document Preview</h3>
                   <div className="max-h-[300px] overflow-y-auto p-4 bg-gray-50 rounded-lg">
@@ -365,18 +363,8 @@ const CreateQuiz = () => {
                     </pre>
                   </div>
                 </div>
-                
-                <div className="flex justify-end mt-4">
-                  <Button 
-                    className="bg-blue-600 hover:bg-blue-700 text-white rounded-full px-8"
-                    onClick={handleSubmit}
-                    disabled={isLoading}
-                  >
-                    {isLoading ? "Generating..." : "Generate Quiz"}
-                  </Button>
-                </div>
-              </>
             )}
+            {renderGenerateButton()}
           </div>
         );
 
