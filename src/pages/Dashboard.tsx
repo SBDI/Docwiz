@@ -1,25 +1,22 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/lib/AuthContext';
-import { supabase } from '@/lib/supabase';
+import { queries } from '@/lib/supabase/client';
+import type { Database } from '@/lib/database.types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ShareDialog } from "@/components/quiz/ShareDialog"
 
-interface QuizHistory {
-  id: string;
-  createdAt: string;
-  title: string;
-  questionsCount: number;
-  status: 'completed' | 'draft';
+type Quiz = Database['public']['Tables']['quizzes']['Row'] & {
+  questions: Database['public']['Tables']['questions']['Row'][]
 }
 
 const Dashboard = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [credits, setCredits] = useState(5);
-  const [recentQuizzes, setRecentQuizzes] = useState<QuizHistory[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [quizzes, setQuizzes] = useState<Quiz[]>([]);
+  const [loading, setLoading] = useState(true);
   const [selectedQuiz, setSelectedQuiz] = useState<{id: string, title: string} | null>(null)
 
   const handleGetMoreCredits = () => {
@@ -39,29 +36,20 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
-    // Fetch user data and quiz history
-    const fetchData = async () => {
-      setIsLoading(true);
+    async function loadQuizzes() {
+      if (!user) return
       try {
-        // TODO: Implement actual data fetching
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        setRecentQuizzes([
-          {
-            id: '1',
-            createdAt: new Date().toISOString(),
-            title: 'Introduction to React',
-            questionsCount: 10,
-            status: 'completed'
-          },
-          // Add more mock data as needed
-        ]);
+        const data = await queries.quizzes.getQuizzes(user.id)
+        setQuizzes(data)
+      } catch (error) {
+        console.error('Error loading quizzes:', error)
       } finally {
-        setIsLoading(false);
+        setLoading(false)
       }
-    };
+    }
 
-    fetchData();
-  }, [user]);
+    loadQuizzes()
+  }, [user])
 
   return (
     <div className="container mx-auto p-6 max-w-7xl">
@@ -154,22 +142,22 @@ const Dashboard = () => {
             </div>
           </CardHeader>
           <CardContent>
-            {isLoading ? (
+            {loading ? (
               <div className="flex justify-center py-8">
                 <div className="w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin" />
               </div>
-            ) : recentQuizzes.length > 0 ? (
+            ) : quizzes.length > 0 ? (
               <div className="divide-y">
-                {recentQuizzes.map((quiz) => (
+                {quizzes.map((quiz) => (
                   <div key={quiz.id} className="py-4 flex items-center justify-between">
                     <div>
                       <h4 className="font-medium text-gray-900">{quiz.title}</h4>
                       <div className="flex items-center gap-4 mt-1">
                         <span className="text-sm text-gray-500">
-                          {new Date(quiz.createdAt).toLocaleDateString()}
+                          {new Date(quiz.created_at).toLocaleDateString()}
                         </span>
                         <span className="text-sm text-gray-500">
-                          {quiz.questionsCount} questions
+                          {quiz.questions.length} questions
                         </span>
                         <span className={`text-sm px-2 py-0.5 rounded-full ${
                           quiz.status === 'completed' 

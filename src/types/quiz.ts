@@ -1,20 +1,22 @@
-import { Database } from "@/integrations/supabase/types";
+import type { QuestionType } from '@/lib/constants'
+import type { Database } from '@/lib/database.types'
 
-export interface Question {
-  id: string;
-  type: 'multiple-choice' | 'true-false' | 'open-ended';
-  question: string;
-  options?: string[];
-  correctAnswer: string | number;
+export type Quiz = Database['public']['Tables']['quizzes']['Row'] & {
+  questions: Question[]
 }
 
-export interface Quiz {
-  id: string;
-  title: string;
-  description: string;
-  questions: Question[];
-  createdAt: string;
-  updatedAt: string;
+export type Question = {
+  id: string
+  quiz_id: string
+  type: QuestionType
+  question: string
+  options: string[] | null
+  correct_answer: string
+  order_index: number
 }
 
-export type QuizResponse = Database['public']['Tables']['quizzes']['Row']; 
+export type QuizCreationData = {
+  title: string
+  description?: string
+  questions: Omit<Question, 'id' | 'quiz_id'>[]
+} 
