@@ -1,7 +1,8 @@
 import React from 'react';
+import { Button } from '@/components/ui/button';
 
 interface Props {
-  children: React.ReactNode;
+  children?: React.ReactNode;
 }
 
 interface State {
@@ -10,24 +11,38 @@ interface State {
 }
 
 class ErrorBoundary extends React.Component<Props, State> {
-  constructor(props: Props) {
-    super(props);
-    this.state = { hasError: false };
-  }
+  public state: State = {
+    hasError: false
+  };
 
-  static getDerivedStateFromError(error: Error) {
+  public static getDerivedStateFromError(error: Error): State {
     return { hasError: true, error };
   }
 
-  render() {
+  public componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error('Uncaught error:', error, errorInfo);
+  }
+
+  private handleReset = () => {
+    this.setState({ hasError: false, error: undefined });
+    window.location.href = '/';
+  };
+
+  public render() {
     if (this.state.hasError) {
       return (
-        <div className="p-4 bg-red-50 text-red-700 rounded-lg">
-          <h2>Something went wrong.</h2>
-          <details className="mt-2">
-            <summary>Error details</summary>
-            <pre className="mt-2 text-sm">{this.state.error?.message}</pre>
-          </details>
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+          <div className="max-w-md w-full p-6 bg-white rounded-lg shadow-lg text-center">
+            <h1 className="text-2xl font-bold text-gray-900 mb-4">
+              Oops! Something went wrong
+            </h1>
+            <p className="text-gray-600 mb-6">
+              {this.state.error?.message || 'An unexpected error occurred'}
+            </p>
+            <Button onClick={this.handleReset}>
+              Return to Home
+            </Button>
+          </div>
         </div>
       );
     }

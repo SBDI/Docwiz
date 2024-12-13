@@ -27,23 +27,25 @@ const Navbar = () => {
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-              <Avatar className="h-8 w-8">
-                <AvatarFallback>{getInitials(user.email)}</AvatarFallback>
+            <Button variant="ghost" className="relative h-9 w-9 rounded-full">
+              <Avatar className="h-9 w-9">
+                <AvatarFallback className="bg-indigo-100 text-indigo-700 font-medium">
+                  {getInitials(user.email)}
+                </AvatarFallback>
               </Avatar>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuItem className="text-sm text-gray-500">
+          <DropdownMenuContent align="end" className="w-56 mt-2">
+            <DropdownMenuItem className="text-sm text-gray-500 font-medium px-3 py-2">
               {user.email}
             </DropdownMenuItem>
-            <DropdownMenuItem asChild>
+            <DropdownMenuItem asChild className="px-3 py-2">
               <Link to="/dashboard">Dashboard</Link>
             </DropdownMenuItem>
-            <DropdownMenuItem asChild>
+            <DropdownMenuItem asChild className="px-3 py-2">
               <Link to="/create">Create Quiz</Link>
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={signOut}>
+            <DropdownMenuItem onClick={signOut} className="px-3 py-2 text-red-600">
               Sign Out
             </DropdownMenuItem>
           </DropdownMenuContent>
@@ -52,11 +54,11 @@ const Navbar = () => {
     }
 
     return (
-      <div className="flex items-center space-x-3">
-        <Button variant="ghost" size="sm" asChild>
+      <div className="flex items-center space-x-4">
+        <Button variant="ghost" size="sm" asChild className="text-gray-600 font-medium">
           <Link to="/sign-in">Sign In</Link>
         </Button>
-        <Button variant="default" size="sm" asChild>
+        <Button size="sm" asChild className="bg-indigo-600 hover:bg-indigo-700">
           <Link to="/sign-up">Sign Up</Link>
         </Button>
       </div>
@@ -64,42 +66,42 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="sticky top-0 z-50 border-b bg-background/80 backdrop-blur-sm">
+    <nav className="sticky top-0 z-50 border-b bg-white/80 backdrop-blur-sm">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-        <div className="flex items-center space-x-8">
+        <div className="flex items-center space-x-10">
           <Link to={handleLogoClick()} className="flex items-center space-x-2">
             <DWLogo />
-            <span className="font-semibold text-xl">Docwiz</span>
+            <span className="font-semibold text-xl tracking-tight">Docwiz</span>
           </Link>
           
           {user && location.pathname !== '/' && (
-            <div className="flex items-center space-x-6">
+            <div className="flex items-center space-x-8">
               <Link
                 to="/dashboard"
-                className={`text-sm font-medium ${
+                className={`text-sm font-medium transition-colors ${
                   location.pathname === "/dashboard"
-                    ? "text-primary"
-                    : "text-muted-foreground hover:text-foreground"
+                    ? "text-indigo-600"
+                    : "text-gray-600 hover:text-gray-900"
                 }`}
               >
                 Dashboard
               </Link>
               <Link
                 to="/create"
-                className={`text-sm font-medium ${
+                className={`text-sm font-medium transition-colors ${
                   location.pathname === "/create"
-                    ? "text-primary"
-                    : "text-muted-foreground hover:text-foreground"
+                    ? "text-indigo-600"
+                    : "text-gray-600 hover:text-gray-900"
                 }`}
               >
                 Create Quiz
               </Link>
               <Link
                 to="/templates"
-                className={`text-sm font-medium ${
+                className={`text-sm font-medium transition-colors ${
                   location.pathname === "/templates"
-                    ? "text-primary"
-                    : "text-muted-foreground hover:text-foreground"
+                    ? "text-indigo-600"
+                    : "text-gray-600 hover:text-gray-900"
                 }`}
               >
                 Templates

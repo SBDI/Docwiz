@@ -9,6 +9,9 @@ import SignIn from "@/pages/SignIn";
 import Index from "@/pages/Index";
 import Templates from "@/pages/Templates";
 import SignUp from "@/pages/SignUp";
+import QuizEditor from "@/pages/QuizEditor";
+import { Toaster } from "@/components/ui/toaster"
+import { SkipLink } from "@/components/ui/skip-link"
 
 const App = () => {
   return (
@@ -16,8 +19,11 @@ const App = () => {
       <ErrorBoundary>
         <AuthProvider>
           <div className="min-h-screen flex flex-col bg-background">
-            <Navbar />
-            <main className="flex-1">
+            <SkipLink />
+            <header role="banner">
+              <Navbar />
+            </header>
+            <main id="main-content" role="main" className="flex-1" tabIndex={-1}>
               <Routes>
                 {/* Public routes */}
                 <Route path="/" element={<Index />} />
@@ -49,11 +55,20 @@ const App = () => {
                     </ProtectedRoute>
                   }
                 />
+                <Route
+                  path="/quiz/:quizId/edit"
+                  element={
+                    <ProtectedRoute>
+                      <QuizEditor />
+                    </ProtectedRoute>
+                  }
+                />
                 
                 {/* Catch all route */}
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
             </main>
+            <Toaster />
           </div>
         </AuthProvider>
       </ErrorBoundary>

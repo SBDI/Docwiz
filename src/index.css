@@ -79,6 +79,76 @@
     margin: 0 auto;
     padding: 1rem;
   }
+
+  /* Responsive typography */
+  h1 {
+    @apply text-3xl sm:text-4xl lg:text-5xl font-bold;
+  }
+
+  h2 {
+    @apply text-2xl sm:text-3xl lg:text-4xl font-semibold;
+  }
+
+  h3 {
+    @apply text-xl sm:text-2xl lg:text-3xl font-semibold;
+  }
+
+  /* Responsive spacing */
+  .section-padding {
+    @apply py-12 sm:py-16 lg:py-24;
+  }
+
+  .content-padding {
+    @apply px-4 sm:px-6 lg:px-8;
+  }
+
+  /* Responsive cards */
+  .responsive-card {
+    @apply p-4 sm:p-6 lg:p-8 rounded-lg;
+  }
+
+  /* Responsive grids */
+  .responsive-grid {
+    @apply grid gap-4 sm:gap-6 lg:gap-8
+           grid-cols-1 sm:grid-cols-2 lg:grid-cols-3;
+  }
+
+  /* Responsive forms */
+  .form-container {
+    @apply max-w-sm sm:max-w-md lg:max-w-lg mx-auto;
+  }
+
+  /* Responsive navigation */
+  .nav-container {
+    @apply flex flex-col sm:flex-row items-center justify-between;
+  }
+
+  /* Responsive buttons */
+  .button-responsive {
+    @apply px-3 py-1.5 sm:px-4 sm:py-2 text-sm sm:text-base;
+  }
+
+  /* Mobile-first design utilities */
+  .mobile-menu {
+    @apply fixed inset-0 z-50 bg-background/95 backdrop-blur-sm
+           transform transition-transform duration-300;
+  }
+
+  .mobile-menu-enter {
+    @apply translate-x-full;
+  }
+
+  .mobile-menu-enter-active {
+    @apply translate-x-0;
+  }
+
+  .mobile-menu-exit {
+    @apply translate-x-0;
+  }
+
+  .mobile-menu-exit-active {
+    @apply translate-x-full;
+  }
 }
 
 @layer utilities {

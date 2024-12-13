@@ -1,13 +1,20 @@
 import { Database } from "@/integrations/supabase/types";
 
+export interface Question {
+  id: string;
+  type: 'multiple-choice' | 'true-false' | 'open-ended';
+  question: string;
+  options?: string[];
+  correctAnswer: string | number;
+}
+
 export interface Quiz {
-  id: number;
-  name: string;
-  source: "Text Input" | "Document" | "Web Link";
-  date: string;
-  questions: number;
-  user_id: string;
-  created_at: string;
+  id: string;
+  title: string;
+  description: string;
+  questions: Question[];
+  createdAt: string;
+  updatedAt: string;
 }
 
 export type QuizResponse = Database['public']['Tables']['quizzes']['Row']; 

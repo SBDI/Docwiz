@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import NeuralBackground from "@/components/ui/neural-background";
+import { useEffect } from "react";
 
 const PricingTier = ({ name, price, features, recommended = false }) => (
   <div className={`relative bg-white/50 backdrop-blur-sm p-8 rounded-2xl border ${recommended ? 'border-indigo-500 shadow-lg' : 'border-gray-200'}`}>
@@ -36,7 +37,113 @@ const PricingTier = ({ name, price, features, recommended = false }) => (
   </div>
 );
 
+const HowItWorks = () => (
+  <div className="py-24 bg-gradient-to-b from-white to-gray-50">
+    <div className="container mx-auto px-4">
+      <div className="text-center mb-16">
+        <h2 className="text-3xl font-bold text-gray-900 mb-4">How It Works</h2>
+        <p className="text-gray-600 max-w-2xl mx-auto">
+          Create engaging quizzes in just two simple steps
+        </p>
+      </div>
+
+      <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+        {/* Step 1 */}
+        <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
+          <div className="mb-6">
+            <span className="inline-block text-sm font-semibold text-indigo-600 bg-indigo-50 rounded-full px-3 py-1">
+              Step 1: Upload
+            </span>
+          </div>
+          <h3 className="text-xl font-semibold text-gray-900 mb-4">
+            Upload Your Content
+          </h3>
+          <p className="text-gray-600 mb-6">
+            Upload a picture, paste text, or add a document to easily convert your study materials into a quiz.
+          </p>
+          <div className="flex flex-wrap gap-3">
+            <span className="inline-flex items-center text-sm text-gray-600 bg-gray-100 rounded-full px-3 py-1">
+              <svg className="w-4 h-4 mr-1.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              Documents
+            </span>
+            <span className="inline-flex items-center text-sm text-gray-600 bg-gray-100 rounded-full px-3 py-1">
+              <svg className="w-4 h-4 mr-1.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              Images
+            </span>
+            <span className="inline-flex items-center text-sm text-gray-600 bg-gray-100 rounded-full px-3 py-1">
+              <svg className="w-4 h-4 mr-1.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              Text
+            </span>
+          </div>
+        </div>
+
+        {/* Step 2 */}
+        <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
+          <div className="mb-6">
+            <span className="inline-block text-sm font-semibold text-indigo-600 bg-indigo-50 rounded-full px-3 py-1">
+              Step 2: That's it
+            </span>
+          </div>
+          <h3 className="text-xl font-semibold text-gray-900 mb-4">
+            Share or Export
+          </h3>
+          <p className="text-gray-600 mb-6">
+            Complete your quiz or share it with as many people as you like. You can also edit or export your quiz.
+          </p>
+          <div className="flex flex-wrap gap-3">
+            <span className="inline-flex items-center text-sm text-gray-600 bg-gray-100 rounded-full px-3 py-1">
+              <svg className="w-4 h-4 mr-1.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+              </svg>
+              Share
+            </span>
+            <span className="inline-flex items-center text-sm text-gray-600 bg-gray-100 rounded-full px-3 py-1">
+              <svg className="w-4 h-4 mr-1.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+              Export
+            </span>
+            <span className="inline-flex items-center text-sm text-gray-600 bg-gray-100 rounded-full px-3 py-1">
+              <svg className="w-4 h-4 mr-1.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+              Edit
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Language Support Banner */}
+      <div className="mt-16 text-center">
+        <p className="text-gray-600">
+          Works in over 50 languages including Arabic
+        </p>
+      </div>
+    </div>
+  </div>
+);
+
 const Index = () => {
+  useEffect(() => {
+    if (window.location.hash === '#pricing') {
+      const pricingSection = document.getElementById('pricing');
+      if (pricingSection) {
+        setTimeout(() => {
+          pricingSection.scrollIntoView({ 
+            behavior: 'smooth',
+            block: 'start'
+          });
+        }, 100);
+      }
+    }
+  }, []);
+
   return (
     <div className="relative min-h-screen overflow-hidden">
       <NeuralBackground />
@@ -93,6 +200,9 @@ const Index = () => {
         </motion.div>
       </div>
 
+      {/* How it Works Section */}
+      <HowItWorks />
+
       {/* Features Grid */}
       <motion.div
         initial={{ opacity: 0, y: 40 }}
@@ -135,10 +245,11 @@ const Index = () => {
 
       {/* Pricing Section */}
       <motion.div
+        id="pricing"
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 1.4, duration: 0.8 }}
-        className="relative container mx-auto px-4 py-16"
+        className="relative container mx-auto px-4 py-16 scroll-mt-20"
       >
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold mb-4">Simple, Transparent Pricing</h2>
