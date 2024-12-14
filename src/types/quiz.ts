@@ -19,4 +19,20 @@ export type QuizCreationData = {
   title: string
   description?: string
   questions: Omit<Question, 'id' | 'quiz_id'>[]
+}
+
+export interface QuizQuestion {
+  id: string;
+  quiz_id: string;
+  type: 'multiple-choice' | 'true-false' | 'open-ended';
+  question: string;
+  options: string[];
+  correct_answer: string;
+  order_index: number;
+}
+
+export interface QuizPreviewProps {
+  questions: QuizQuestion[];
+  onClose: () => void;
+  onSave?: (title: string) => Promise<void>;
 } 

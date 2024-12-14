@@ -12,6 +12,12 @@ import PageSelectionDialog from "@/components/quiz/PageSelectionDialog";
 import { DocumentParser } from '@/lib/documentParser';
 import { LoadingOverlay } from "@/components/ui/loading-overlay";
 import { useToast } from "@/components/ui/use-toast"
+import { supabase } from '@/lib/supabase'
+import QuizPreview from '@/components/quiz/QuizPreview';
+import type { QuizGenerationResponse } from '@/lib/api.types';
+import { testOllamaConnection } from '@/lib/ollama'
+import { testTinyLlama } from '@/lib/ollama'
+import { ollamaClient } from '@/lib/ollama'
 
 const inputTypes = [
   {
@@ -82,6 +88,9 @@ const CreateQuiz = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [generationProgress, setGenerationProgress] = useState<number>(0);
   const [generationMessage, setGenerationMessage] = useState<string>("");
+  const [isGenerating, setIsGenerating] = useState(false)
+  const [generatedQuiz, setGeneratedQuiz] = useState<QuizGenerationResponse | null>(null);
+  const [showPreview, setShowPreview] = useState(false);
 
   // Refs after state declarations
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -93,32 +102,80 @@ const CreateQuiz = () => {
     }
   }, [user, authLoading, navigate]);
 
+  useEffect(() => {
+    const checkConnection = async () => {
+      const isConnected = await testOllamaConnection();
+      if (!isConnected) {
+        toast({
+          title: "Ollama Connection Error",
+          description: "Make sure Ollama is running (ollama serve)",
+          variant: "destructive",
+        });
+      } else {
+        console.log("Connected to Ollama successfully!");
+      }
+    };
+
+    checkConnection();
+  }, []);
+
+  const handleGenerate = async (content: string) => {
+    setIsGenerating(true)
+    try {
+      const quiz = await ollamaClient.generateQuiz(content)
+      
+      const { data, error } = await supabase
+        .from('quizzes')
+        .insert({
+          questions: quiz,
+          content: content,
+          created_at: new Date().toISOString()
+        })
+        .select()
+        .single()
+
+      if (error) throw error
+      
+      return data
+    } catch (error) {
+      console.error('Failed to create quiz:', error)
+      throw error
+    } finally {
+      setIsGenerating(false)
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
     try {
-      // Simulated generation process
       setGenerationMessage("Analyzing content...");
-      setGenerationProgress(0);
-      await simulateProgress(0, 30);
+      setGenerationProgress(30);
 
-      setGenerationMessage("Generating questions...");
-      await simulateProgress(30, 60);
+      const content = activeTab === 'text' ? textInput : parsedContent;
+      
+      if (!content) {
+        throw new Error('No content provided');
+      }
 
-      setGenerationMessage("Validating questions...");
-      await simulateProgress(60, 80);
+      setGenerationMessage("Model is loading, please wait...");
+      setGenerationProgress(50);
 
-      setGenerationMessage("Finalizing quiz...");
-      await simulateProgress(80, 100);
+      const quiz = await ollamaClient.generateQuiz(content);
+      setGeneratedQuiz({ questions: quiz });
+      
+      setGenerationMessage("Quiz generated!");
+      setGenerationProgress(100);
+
+      setShowPreview(true);
 
       toast({
         title: "Quiz Generated Successfully",
-        description: "Your quiz is ready to use!",
+        description: "Your quiz is ready to preview!",
         variant: "success",
       });
 
-      navigate('/dashboard');
     } catch (error) {
       toast({
         title: "Error",
@@ -475,6 +532,42 @@ const CreateQuiz = () => {
     }
   };
 
+  const handleSaveQuiz = async (title: string) => {
+    if (!generatedQuiz) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('quizzes')
+        .insert({
+          title,
+          questions: generatedQuiz.questions,
+          created_at: new Date().toISOString(),
+          user_id: user?.id
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      navigate(`/quiz/${data.id}`);
+    } catch (error) {
+      console.error('Failed to save quiz:', error);
+      throw error;
+    }
+  };
+
+  if (showPreview && generatedQuiz) {
+    return (
+      <div className="container mx-auto p-6 max-w-4xl">
+        <QuizPreview 
+          questions={generatedQuiz.questions}
+          onClose={() => setShowPreview(false)}
+          onSave={handleSaveQuiz}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto p-6 max-w-4xl">
       <div className="flex flex-col gap-6">
@@ -534,6 +627,21 @@ const CreateQuiz = () => {
             subMessage="This may take a few moments..."
           />
         )}
+
+        <Button 
+          onClick={async () => {
+            const isWorking = await testTinyLlama();
+            toast({
+              title: isWorking ? "Test Successful" : "Test Failed",
+              description: isWorking 
+                ? "TinyLlama is working correctly!" 
+                : "Failed to generate test question",
+              variant: isWorking ? "success" : "destructive",
+            });
+          }}
+        >
+          Test TinyLlama
+        </Button>
       </div>
     </div>
   );

@@ -1,10 +1,8 @@
-export interface GenerateQuizResponse {
-  id: string
+export interface QuizGenerationResponse {
   questions: Array<{
     question: string
-    type: 'multiple-choice' | 'true-false'
-    options?: string[]
-    correctAnswer: string
+    options: string[]
+    correct_answer: string
   }>
 }
 

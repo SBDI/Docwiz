@@ -7,19 +7,37 @@ interface GenerateQuizRequest {
   title?: string
 }
 
+const OLLAMA_URL = 'http://localhost:11434'
+
 serve(async (req) => {
   try {
     const { content, userId, title } = await req.json() as GenerateQuizRequest
     const supabase = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+      Deno.env.get('VITE_SUPABASE_URL') ?? '',
+      Deno.env.get('VITE_SUPABASE_ANON_KEY') ?? ''
     )
 
-    // Your AI quiz generation logic here
-    // ...
+    // Generate quiz using Ollama
+    const response = await fetch(`${OLLAMA_URL}/api/generate`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: Deno.env.get('OLLAMA_MODEL'),
+        prompt: content,
+        stream: false
+      })
+    })
+
+    if (!response.ok) {
+      throw new Error('Failed to generate quiz')
+    }
+
+    const result = await response.json()
 
     return new Response(
-      JSON.stringify({ message: 'Quiz generated successfully' }),
+      JSON.stringify({ questions: result.response }),
       { headers: { 'Content-Type': 'application/json' } }
     )
   } catch (error) {

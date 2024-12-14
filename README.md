@@ -1,26 +1,34 @@
-# Welcome to your Lovable project
+# Docwiz - AI-Powered Quiz Generator
 
-## Project info
+Transform documents into smart quizzes instantly with Docwiz. Perfect for educators, trainers, and content creators.
 
-**URL**: https://lovable.dev/projects/33086a0b-dc74-42e0-bf4d-0baa3ad2b87a
+## Features
 
-## How can I edit this code?
+- 📄 Multiple Document Formats: Support for PDFs, docs, images, and text files
+- ⚡ Lightning Fast: Generate comprehensive quizzes in seconds with advanced AI
+- 🧠 Smart Analysis: AI understands context and generates relevant questions
+- 🌍 Multi-Language Support: Works in over 50 languages including Arabic
+- 💎 Premium Templates: Access pre-made quiz templates for various subjects
 
-There are several ways of editing your application.
+## Tech Stack
 
-**Use Lovable**
+This project is built with modern web technologies:
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/33086a0b-dc74-42e0-bf4d-0baa3ad2b87a) and start prompting.
+- Vite
+- TypeScript
+- React
+- shadcn-ui
+- Tailwind CSS
+- Supabase
+- Framer Motion
 
-Changes made via Lovable will be committed automatically to this repo.
+## Getting Started
 
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Prerequisites
 
 The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
 
-Follow these steps:
+### Development Setup
 
 ```sh
 # Step 1: Clone the repository using the project's Git URL.
@@ -67,3 +75,30 @@ Simply open [Lovable](https://lovable.dev/projects/33086a0b-dc74-42e0-bf4d-0baa3
 ## I want to use a custom domain - is that possible?
 
 We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+
+### Environment Setup
+
+1. Copy `.env.example` to `.env`:
+```sh
+cp .env.example .env
+```
+
+2. Get your API keys:
+   - HuggingFace API key from [huggingface.co/settings/tokens](https://huggingface.co/settings/tokens)
+   - Supabase credentials from your project settings
+
+3. Update `.env` with your keys
+
+### Testing HuggingFace API Key
+
+1. After setting up your environment, start the development server:
+```sh
+npm run dev
+```
+
+2. Open your browser's developer tools (F12)
+3. Look for the console message:
+   - ✅ "HuggingFace API key is valid!" - Your key is working
+   - ❌ "API Authentication Error" - Your key needs to be checked
+
+Note: Make sure your HuggingFace API key has read access to the model

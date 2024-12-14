@@ -1,15 +1,10 @@
-import { huggingfaceApi } from './huggingface'
-import { openRouterApi } from './openrouter'
+import { ollamaClient } from '../ollama'
 import { QuizGenerationResponseSchema } from './types'
-import { config } from '@/config'
-
-const AI_PROVIDER = config.ai.provider // 'huggingface' | 'openrouter'
 
 export const aiClient = {
   generateQuiz: async (content: string) => {
     try {
-      const api = AI_PROVIDER === 'huggingface' ? huggingfaceApi : openRouterApi
-      const response = await api.generateQuiz(content)
+      const response = await ollamaClient.generateQuiz(content)
       
       // Validate response
       const validated = QuizGenerationResponseSchema.parse(response)
