@@ -21,8 +21,8 @@ interface OllamaQuizResponse {
   questions: OllamaQuizQuestion[];
 }
 
-// Update the base URL to use port 3456
-const OLLAMA_BASE_URL = 'http://localhost:3456';
+// Use config instead of hardcoded value
+const OLLAMA_BASE_URL = config.ai.url;
 
 export const ollamaClient = {
   generateQuiz: async (content: string): Promise<Question[]> => {
@@ -56,7 +56,7 @@ Example of the required JSON format:
       console.log('Sending request to:', `${OLLAMA_BASE_URL}/api/generate`);
       
       const requestBody = {
-        model: 'tinyllama:1.1b-chat',
+        model: config.ai.model,
         prompt,
         stream: false,
         // Add parameters to control response

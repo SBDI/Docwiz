@@ -11,6 +11,15 @@
 
   <body>
     <div id="root"></div>
+    <script>
+      window.addEventListener('message', function(event) {
+        // Verify the origin
+        if (event.origin !== 'https://cdn.gpteng.co') {
+          return;
+        }
+        // Handle the message
+      }, false);
+    </script>
     <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
