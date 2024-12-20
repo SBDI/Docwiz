@@ -21,6 +21,7 @@ This project is built with modern web technologies:
 - Tailwind CSS
 - Supabase
 - Framer Motion
+- X.AI API (Grok model) for quiz generation
 
 ## Getting Started
 
@@ -67,6 +68,7 @@ This project is built with .
 - React
 - shadcn-ui
 - Tailwind CSS
+- X.AI API (Grok model) for quiz generation
 
 ## How can I deploy this project?
 
@@ -86,6 +88,7 @@ cp .env.example .env
 2. Get your API keys:
    - HuggingFace API key from [huggingface.co/settings/tokens](https://huggingface.co/settings/tokens)
    - Supabase credentials from your project settings
+   - X.AI API key from [X.AI dashboard](https://x.ai/dashboard)
 
 3. Update `.env` with your keys
 
@@ -98,7 +101,33 @@ npm run dev
 
 2. Open your browser's developer tools (F12)
 3. Look for the console message:
-   - ✅ "HuggingFace API key is valid!" - Your key is working
-   - ❌ "API Authentication Error" - Your key needs to be checked
+   - "HuggingFace API key is valid!" - Your key is working
+   - "API Authentication Error" - Your key needs to be checked
 
 Note: Make sure your HuggingFace API key has read access to the model
+
+### API Integration
+
+Docwiz uses the X.AI API with the Grok model for quiz generation. The API is fully compatible with the OpenAI API format, making it easy to integrate and maintain.
+
+### Configuration
+
+The API is configured in `src/config/index.ts`:
+```typescript
+export const config = {
+  ai: {
+    model: 'grok-2-1212',
+    apiKey: import.meta.env.VITE_XAI_API_KEY,
+    baseUrl: 'https://api.x.ai/v1'
+  }
+}
+```
+
+### Quiz Generation
+
+Quizzes are generated using a structured prompt that ensures consistent formatting and high-quality questions. The system supports:
+
+- Multiple choice questions
+- Automatic answer validation
+- Context-aware question generation
+- Customizable number of options
