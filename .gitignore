@@ -37,3 +37,6 @@ yarn-error.log*
 # OS
 .DS_Store
 Thumbs.db
+
+# Custom rules
+cursurrules

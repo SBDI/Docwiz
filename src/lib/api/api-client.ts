@@ -1,4 +1,4 @@
-import { API_ROUTES, schemas } from './routes'
+import { API_ROUTES, CreateQuizRequest, QuizAttemptRequest, schemas } from './routes'
 import { config } from '@/config'
 
 class APIError extends Error {

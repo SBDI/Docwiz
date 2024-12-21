@@ -8,15 +8,15 @@ export function useQuiz() {
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
 
-  const createQuiz = async (data: QuizCreationData) => {
+  const saveQuiz = async (data: QuizCreationData) => {
     setLoading(true)
     try {
-      const quiz = await queries.quizzes.createQuiz(data)
-      toast.success('Quiz created successfully!')
+      const quiz = await queries.quizzes.saveQuiz(data)
+      toast.success('Quiz saved successfully!')
       navigate(`/quiz/${quiz.id}/edit`)
       return quiz
     } catch (error) {
-      toast.error('Failed to create quiz')
+      toast.error('Failed to save quiz')
       throw error
     } finally {
       setLoading(false)
@@ -39,7 +39,7 @@ export function useQuiz() {
 
   return {
     loading,
-    createQuiz,
+    saveQuiz,
     updateQuiz
   }
 } 

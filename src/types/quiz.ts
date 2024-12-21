@@ -15,10 +15,8 @@ export type Question = {
   order_index: number
 }
 
-export type QuizCreationData = {
-  title: string
-  description?: string
-  questions: Omit<Question, 'id' | 'quiz_id'>[]
+export type QuizCreationData = Omit<Database['public']['Tables']['quizzes']['Insert'], 'id'> & {
+  questions: Array<Omit<Database['public']['Tables']['questions']['Insert'], 'id' | 'quiz_id'>>
 }
 
 export interface QuizQuestion {
@@ -29,10 +27,11 @@ export interface QuizQuestion {
   options: string[];
   correct_answer: string;
   order_index: number;
+  explanation?: string;
 }
 
 export interface QuizPreviewProps {
   questions: QuizQuestion[];
   onClose: () => void;
   onSave?: (title: string) => Promise<void>;
-} 
+}

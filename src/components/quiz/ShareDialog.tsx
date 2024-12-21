@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { toast } from "@/components/ui/use-toast"
@@ -74,6 +74,9 @@ export function ShareDialog({ open, onOpenChange, quizId, quizTitle }: ShareDial
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Share Quiz</DialogTitle>
+          <DialogDescription>
+            Share this quiz with others using the link below
+          </DialogDescription>
         </DialogHeader>
         <div className="space-y-4 py-4">
           <div className="flex items-center space-x-2">

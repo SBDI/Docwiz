@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import {
   Select,
@@ -15,21 +16,46 @@ import {
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 
+interface QuizOptions {
+  language: string;
+  questionType: string;
+  difficulty: string;
+}
+
 interface OptionsDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onSubmit: (options: QuizOptions) => void;
+  options: QuizOptions;
 }
 
-const OptionsDialog = ({ open, onOpenChange }: OptionsDialogProps) => {
-  const [language, setLanguage] = useState("auto");
-  const [questionType, setQuestionType] = useState("mix");
-  const [difficulty, setDifficulty] = useState("auto");
+const OptionsDialog = ({ open, onOpenChange, onSubmit, options }: OptionsDialogProps) => {
+  const [language, setLanguage] = useState(options.language);
+  const [questionType, setQuestionType] = useState(options.questionType);
+  const [difficulty, setDifficulty] = useState(options.difficulty);
+
+  useEffect(() => {
+    setLanguage(options.language);
+    setQuestionType(options.questionType);
+    setDifficulty(options.difficulty);
+  }, [options]);
+
+  const handleSubmit = () => {
+    onSubmit({
+      language,
+      questionType,
+      difficulty
+    });
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px] bg-white">
         <DialogHeader>
           <DialogTitle>Quiz Options</DialogTitle>
+          <DialogDescription>
+            Customize the settings for your quiz generation
+          </DialogDescription>
         </DialogHeader>
         <div className="grid gap-6 py-4">
           <div className="grid gap-2">
@@ -39,11 +65,12 @@ const OptionsDialog = ({ open, onOpenChange }: OptionsDialogProps) => {
                 <SelectValue placeholder="Select language" />
               </SelectTrigger>
               <SelectContent className="bg-white">
-                <SelectItem value="auto">Auto Detect</SelectItem>
-                <SelectItem value="english">English</SelectItem>
-                <SelectItem value="spanish">Spanish</SelectItem>
-                <SelectItem value="french">French</SelectItem>
-                <SelectItem value="german">German</SelectItem>
+                <SelectItem value="Auto Detect">Auto Detect</SelectItem>
+                <SelectItem value="English">English</SelectItem>
+                <SelectItem value="Spanish">Spanish</SelectItem>
+                <SelectItem value="French">French</SelectItem>
+                <SelectItem value="German">German</SelectItem>
+                <SelectItem value="Arabic">Arabic</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -55,11 +82,11 @@ const OptionsDialog = ({ open, onOpenChange }: OptionsDialogProps) => {
                 <SelectValue placeholder="Select question type" />
               </SelectTrigger>
               <SelectContent className="bg-white">
-                <SelectItem value="mix">Mix (All Types)</SelectItem>
-                <SelectItem value="multiple-choice">Multiple Choice</SelectItem>
-                <SelectItem value="true-false">True/False</SelectItem>
-                <SelectItem value="fill-blank">Fill in the Blank</SelectItem>
-                <SelectItem value="open-ended">Open Ended</SelectItem>
+                <SelectItem value="Mix (All Types)">Mix (All Types)</SelectItem>
+                <SelectItem value="Factual">Factual</SelectItem>
+                <SelectItem value="Conceptual">Conceptual</SelectItem>
+                <SelectItem value="Analytical">Analytical</SelectItem>
+                <SelectItem value="Application">Application</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -71,10 +98,11 @@ const OptionsDialog = ({ open, onOpenChange }: OptionsDialogProps) => {
                 <SelectValue placeholder="Select difficulty" />
               </SelectTrigger>
               <SelectContent className="bg-white">
-                <SelectItem value="auto">Auto</SelectItem>
-                <SelectItem value="easy">Easy</SelectItem>
-                <SelectItem value="medium">Medium</SelectItem>
-                <SelectItem value="hard">Hard</SelectItem>
+                <SelectItem value="Auto">Auto</SelectItem>
+                <SelectItem value="Easy">Easy</SelectItem>
+                <SelectItem value="Medium">Medium</SelectItem>
+                <SelectItem value="Hard">Hard</SelectItem>
+                <SelectItem value="Expert">Expert</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -91,7 +119,7 @@ const OptionsDialog = ({ open, onOpenChange }: OptionsDialogProps) => {
           <Button
             type="submit"
             className="bg-blue-600 hover:bg-blue-700 text-white"
-            onClick={() => onOpenChange(false)}
+            onClick={handleSubmit}
           >
             Apply
           </Button>
@@ -101,4 +129,4 @@ const OptionsDialog = ({ open, onOpenChange }: OptionsDialogProps) => {
   );
 };
 
-export default OptionsDialog; 
+export default OptionsDialog;

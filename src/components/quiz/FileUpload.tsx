@@ -1,11 +1,14 @@
 import React, { useRef } from 'react';
 import { Button } from '@/components/ui/button';
+import { StoredDocument } from '@/lib/documentStorage';
 
 interface FileUploadProps {
   onFileSelect: (file: File) => void;
+  savedDocuments?: StoredDocument[];
+  onDocumentSelect?: (document: StoredDocument) => void;
 }
 
-const FileUpload: React.FC<FileUploadProps> = ({ onFileSelect }) => {
+const FileUpload: React.FC<FileUploadProps> = ({ onFileSelect, savedDocuments, onDocumentSelect }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleClick = () => {

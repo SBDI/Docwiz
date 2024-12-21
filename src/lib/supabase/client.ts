@@ -79,15 +79,35 @@ export const queries = {
       if (error) throw error
       return data
     },
-    createQuiz: async (quiz: Database['public']['Tables']['quizzes']['Insert']) => {
-      const { data, error } = await supabase
+    saveQuiz: async (quiz: Omit<Database['public']['Tables']['quizzes']['Insert'], 'id'> & { questions?: Array<Omit<Database['public']['Tables']['questions']['Insert'], 'id' | 'quiz_id'>> }) => {
+      const { data: quizData, error: quizError } = await supabase
         .from('quizzes')
-        .insert(quiz)
+        .insert({
+          title: quiz.title,
+          description: quiz.description ?? null,
+          user_id: quiz.user_id,
+          is_public: quiz.is_public ?? false
+        })
         .select()
         .single()
       
-      if (error) throw error
-      return data
+      if (quizError) throw quizError
+
+      if (quiz.questions?.length) {
+        const { error: questionsError } = await supabase
+          .from('questions')
+          .insert(
+            quiz.questions.map((q, index) => ({
+              ...q,
+              quiz_id: quizData.id,
+              order_index: q.order_index ?? index
+            }))
+          )
+        
+        if (questionsError) throw questionsError
+      }
+
+      return quizData
     },
     updateQuiz: async (quizId: string, updates: Database['public']['Tables']['quizzes']['Update']) => {
       const { data, error } = await supabase
