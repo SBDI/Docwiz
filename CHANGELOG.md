@@ -1,5 +1,28 @@
 # Changelog
 
+## [1.2.0] - 2024-12-22
+
+### Added
+- New Quiz Components:
+  - QuizCard and QuizCardComponent for improved quiz display
+  - QuizResults component for displaying quiz outcomes
+  - QuizTaking component for quiz interaction
+- Enhanced quiz preview functionality
+- New database migrations for questions and quiz RLS
+
+### Changed
+- Updated file upload and options dialog UI
+- Modified AI and API client implementations
+- Enhanced document parser functionality
+- Improved Supabase client integration
+- Updated textarea UI component
+- Enhanced types for quiz system
+
+### Technical
+- Added cursurrules to gitignore
+- Updated project dependencies
+- Improved Row Level Security (RLS) for questions and quiz tables
+
 ## [1.1.0] - 2024-12-20
 
 ### Changed
