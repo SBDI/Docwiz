@@ -4,12 +4,31 @@ import { Button } from "@/components/ui/button";
 import { queries } from "@/lib/supabase/client";
 import { Share2, Eye, Book, Shuffle, Download, Play, ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
-import type { Question } from "@/types/quiz";
+import type { Question, QuizQuestion, DatabaseQuestion, QuestionType, UIQuestionType } from "@/types/quiz";
 import QuizResults from "@/components/quiz/QuizResults";
 import ExplanationView from "@/components/quiz/ExplanationView";
 import ExplanationEditor from "@/components/quiz/ExplanationEditor";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
+
+// Helper function to map database question type to UI question type
+const mapQuestionType = (type: QuestionType): UIQuestionType => {
+  if (type === 'fill-in-blank') return 'open-ended';
+  return type;
+};
+
+// Helper function to map database question to UI question
+const mapDatabaseQuestion = (q: DatabaseQuestion): Question => ({
+  ...q,
+  type: mapQuestionType(q.type),
+  options: q.options || []
+});
+
+// Helper function to map UI question to QuizQuestion (for components that need it)
+const mapToQuizQuestion = (q: Question): QuizQuestion => ({
+  ...q,
+  options: q.options || []
+});
 
 export default function QuizView() {
   const { quizId } = useParams();
@@ -22,7 +41,10 @@ export default function QuizView() {
     title: string;
     description: string | null;
     questions: Question[];
-  } | null>(quizFromState || null);
+  } | null>(quizFromState ? {
+    ...quizFromState,
+    questions: quizFromState.questions.map(mapDatabaseQuestion)
+  } : null);
   const [loading, setLoading] = useState(!quizFromState);
   const [isTakingQuiz, setIsTakingQuiz] = useState(false);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -44,7 +66,10 @@ export default function QuizView() {
           navigate('/history');
           return;
         }
-        setQuiz(data);
+        setQuiz({
+          ...data,
+          questions: data.questions.map(mapDatabaseQuestion)
+        });
       } catch (error) {
         console.error("Failed to load quiz:", error);
         toast.error('Failed to load quiz');
@@ -187,43 +212,94 @@ export default function QuizView() {
       <div className="flex gap-8">
         {/* Main Content */}
         <div className="flex-1 space-y-6">
-          {quiz?.questions.map((question, index) => (
-            <Card key={question.id} className="p-6">
+          {isTakingQuiz ? (
+            <Card className="p-6">
               <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <h3 className="text-lg font-medium">
+                    Question {currentQuestionIndex + 1} of {quiz.questions.length}
+                  </h3>
+                  <div className="text-sm text-gray-500">
+                    Progress: {Math.round(progress)}%
+                  </div>
+                </div>
                 <h3 className="text-lg font-medium">
-                  {index + 1}. {question.question}
+                  {currentQuestion.question}
                 </h3>
                 <div className="grid gap-2">
-                  {question.options?.map((option) => (
-                    <div
+                  {currentQuestion.options?.map((option) => (
+                    <Button
                       key={option}
-                      className={cn(
-                        "p-4 rounded-lg border",
-                        option === question.correct_answer
-                          ? "bg-green-50 border-green-200"
-                          : "bg-white"
-                      )}
+                      variant={selectedAnswers[currentQuestion.id] === option ? "default" : "outline"}
+                      className="w-full justify-start p-4 h-auto"
+                      onClick={() => handleAnswerSelect(option)}
                     >
                       {option}
-                    </div>
+                    </Button>
                   ))}
                 </div>
-                <ExplanationView
-                  explanation={question.explanation}
-                  isVisible={showExplanations}
-                  className="mt-4"
-                />
-                <ExplanationEditor
-                  questionId={question.id}
-                  question={question.question}
-                  correctAnswer={question.correct_answer}
-                  topic={quiz.title}
-                  initialExplanation={question.explanation}
-                  onSave={(explanation) => handleUpdateExplanation(question.id, explanation)}
-                />
+                <div className="flex justify-between mt-4">
+                  <Button
+                    variant="outline"
+                    onClick={handlePrevQuestion}
+                    disabled={currentQuestionIndex === 0}
+                  >
+                    Previous
+                  </Button>
+                  <Button
+                    onClick={handleNextQuestion}
+                    disabled={!selectedAnswers[currentQuestion.id]}
+                  >
+                    {isLastQuestion ? "Finish Quiz" : "Next Question"}
+                  </Button>
+                </div>
               </div>
             </Card>
-          ))}
+          ) : (
+            quiz?.questions.map((question, index) => {
+              const quizQuestion = mapToQuizQuestion(question);
+              return (
+                <Card key={question.id} className="p-6">
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-medium">
+                      {index + 1}. {question.question}
+                    </h3>
+                    <div className="grid gap-2">
+                      {quizQuestion.options.map((option) => (
+                        <div
+                          key={option}
+                          className={cn(
+                            "p-4 rounded-lg border",
+                            showAnswers && option === question.correct_answer
+                              ? "bg-green-50 border-green-200"
+                              : "bg-white"
+                          )}
+                        >
+                          {option}
+                          {showAnswers && option === question.correct_answer && (
+                            <span className="ml-2 text-sm text-green-600">(Correct Answer)</span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                    <ExplanationView
+                      explanation={question.explanation}
+                      isVisible={showExplanations}
+                      className="mt-4"
+                    />
+                    <ExplanationEditor
+                      questionId={question.id}
+                      question={question.question}
+                      correctAnswer={question.correct_answer}
+                      topic={quiz.title}
+                      initialExplanation={question.explanation}
+                      onSave={(explanation) => handleUpdateExplanation(question.id, explanation)}
+                    />
+                  </div>
+                </Card>
+              );
+            })
+          )}
         </div>
 
         {/* Right Sidebar */}
@@ -260,7 +336,7 @@ export default function QuizView() {
             onClick={() => setShowAnswers(!showAnswers)}
           >
             <Eye className="w-4 h-4 mr-2" />
-            Show Answer
+            {showAnswers ? "Hide Answer" : "Show Answer"}
           </Button>
           <Button
             variant="outline"
@@ -297,7 +373,7 @@ export default function QuizView() {
           setIsTakingQuiz(false);
         }}
         onTryAgain={handleTryAgain}
-        questions={quiz.questions}
+        questions={quiz.questions.map(mapToQuizQuestion)}
         answers={selectedAnswers}
         score={quizScore}
       />

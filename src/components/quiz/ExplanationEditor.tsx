@@ -6,12 +6,18 @@ import { toast } from "sonner";
 
 interface ExplanationEditorProps {
   questionId: string;
+  question: string;
+  correctAnswer: string;
+  topic: string;
   initialExplanation: string | null;
   onSave: (explanation: string) => Promise<void>;
 }
 
 export default function ExplanationEditor({
   questionId,
+  question,
+  correctAnswer,
+  topic,
   initialExplanation,
   onSave,
 }: ExplanationEditorProps) {

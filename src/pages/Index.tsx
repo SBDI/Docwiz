@@ -159,9 +159,9 @@ const Index = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            Create AI-Powered Quizzes
+            From a document to a 
             <br />
-            <span className="text-indigo-600">in Minutes</span>
+            <span className="text-indigo-600">Wiz in Seconds 📋</span>
           </motion.h1>
           <motion.p 
             className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto"
