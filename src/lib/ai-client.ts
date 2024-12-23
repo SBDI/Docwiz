@@ -54,10 +54,50 @@ const makeApiRequest = async (messages: Array<{ role: string; content: string }>
 };
 
 const cleanJsonString = (str: string): string => {
-  return str
-    .replace(/^[^{]*/, '')  // Remove any text before the first {
-    .replace(/[^}]*$/, '')  // Remove any text after the last }
-    .trim();
+  try {
+    // Log the original string for debugging
+    console.log('Original response:', str);
+
+    // First try to find JSON between triple backticks if present
+    const match = str.match(/```json\s*([\s\S]*?)```/) || 
+                 str.match(/```\s*([\s\S]*?)```/);
+    if (match) {
+      const extracted = match[1].trim();
+      console.log('Extracted from backticks:', extracted);
+      return extracted;
+    }
+
+    // If no backticks, try to find array or object
+    let jsonStr = str;
+    
+    // Remove any markdown or text formatting
+    jsonStr = jsonStr.replace(/^[^{\[]*/, ''); // Remove anything before first { or [
+    jsonStr = jsonStr.replace(/[^}\]]*$/, ''); // Remove anything after last } or ]
+    jsonStr = jsonStr.replace(/\\n/g, ' ').replace(/\s+/g, ' '); // Normalize whitespace
+    
+    // Try to parse as is
+    try {
+      JSON.parse(jsonStr);
+      console.log('Cleaned JSON:', jsonStr);
+      return jsonStr;
+    } catch (e) {
+      console.log('Failed to parse cleaned JSON, trying to fix common issues');
+      
+      // Try to fix common JSON issues
+      jsonStr = jsonStr
+        .replace(/,(\s*[}\]])/g, '$1') // Remove trailing commas
+        .replace(/([{,]\s*)(\w+)(\s*:)/g, '$1"$2"$3') // Quote unquoted keys
+        .replace(/'/g, '"') // Replace single quotes with double quotes
+        .trim();
+      
+      console.log('Fixed JSON:', jsonStr);
+      return jsonStr;
+    }
+  } catch (error) {
+    console.error('Error cleaning JSON string:', error);
+    console.error('Original string:', str);
+    throw error;
+  }
 };
 
 const validateQuestion = (q: any, index: number, type: QuestionType): QuestionGeneration => {
@@ -75,12 +115,9 @@ const validateQuestion = (q: any, index: number, type: QuestionType): QuestionGe
 
   const validatedQuestion: QuestionGeneration = {
     question: q.question,
-    options: q.options.map(opt => ({
-      value: opt.value || opt,
-      text: opt.text || opt
-    })),
+    options: q.options.map(opt => typeof opt === 'string' ? opt : opt.text || opt.value || String(opt)),
     correct_answer: q.correct_answer,
-    explanation: q.explanation || `Explanation for question ${index + 1}` // Add default explanation
+    explanation: q.explanation || `Explanation for question ${index + 1}`
   };
 
   return validatedQuestion;
@@ -124,11 +161,20 @@ export const aiClient = {
       const cleanedJson = cleanJsonString(responseContent);
       const parsed = JSON.parse(cleanedJson);
       
-      if (!Array.isArray(parsed.questions)) {
-        throw new Error('Response does not contain questions array');
+      // Handle both array and object formats
+      const questions = Array.isArray(parsed) ? parsed : parsed.questions;
+      
+      if (!Array.isArray(questions)) {
+        throw new Error('Response does not contain valid questions array');
       }
 
-      return parsed.questions.map((q, i) => validateQuestion(q, i, options.questionType));
+      return questions.map((q, i) => ({
+        ...validateQuestion(q, i, options.questionType),
+        id: `temp-${i}`,
+        quiz_id: '',
+        type: options.questionType,
+        order_index: i
+      }));
     } catch (error) {
       console.error('Failed to parse quiz response:', error);
       throw new Error('Failed to generate quiz questions');

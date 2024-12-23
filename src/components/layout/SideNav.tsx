@@ -43,8 +43,8 @@ export function SideNav() {
               className={cn(
                 "flex items-center space-x-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors",
                 isActive
-                  ? "bg-primary text-primary-foreground"
-                  : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                  ? "bg-[rgb(79,70,229)] text-white"
+                  : "text-gray-600 hover:bg-gray-50 hover:text-[rgb(79,70,229)]"
               )}
             >
               <Icon className="h-5 w-5" />
@@ -71,8 +71,8 @@ export function SideNav() {
                 className={cn(
                   "flex items-center space-x-3 px-4 py-2 rounded-lg text-sm font-medium transition-colors",
                   location.pathname === '/settings'
-                    ? "bg-primary text-primary-foreground"
-                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                    ? "bg-[rgb(79,70,229)] text-white"
+                    : "text-gray-600 hover:bg-gray-50 hover:text-[rgb(79,70,229)]"
                 )}
               >
                 <Settings className="h-5 w-5" />
@@ -80,7 +80,7 @@ export function SideNav() {
               </Link>
               <Button
                 variant="ghost"
-                className="w-full justify-start px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                className="w-full justify-start px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-[rgb(79,70,229)]"
                 onClick={() => signOut()}
               >
                 <LogOut className="h-5 w-5 mr-3" />

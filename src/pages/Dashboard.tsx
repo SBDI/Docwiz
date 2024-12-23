@@ -8,18 +8,18 @@ export default function Dashboard() {
   const navigate = useNavigate();
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Header */}
-      <div>
+      <div className="flex flex-col gap-1">
         <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
-        <p className="text-gray-500">Welcome back! Create or manage your quizzes.</p>
+        <p className="text-muted-foreground">Welcome back! Create or manage your quizzes.</p>
       </div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-white p-6 rounded-lg border hover:border-gray-300 transition-colors">
-          <h3 className="font-medium mb-2">Create New Quiz</h3>
-          <p className="text-gray-500 text-sm mb-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="bg-white p-4 rounded-lg border hover:border-gray-300 transition-colors">
+          <h3 className="font-medium mb-1.5">Create New Quiz</h3>
+          <p className="text-muted-foreground text-sm mb-4">
             Generate a quiz using AI or create one manually.
           </p>
           <Button onClick={() => navigate('/create')}>
@@ -28,9 +28,9 @@ export default function Dashboard() {
           </Button>
         </div>
 
-        <div className="bg-white p-6 rounded-lg border hover:border-gray-300 transition-colors">
-          <h3 className="font-medium mb-2">Use Template</h3>
-          <p className="text-gray-500 text-sm mb-4">
+        <div className="bg-white p-4 rounded-lg border hover:border-gray-300 transition-colors">
+          <h3 className="font-medium mb-1.5">Use Template</h3>
+          <p className="text-muted-foreground text-sm mb-4">
             Start with a pre-made template to save time.
           </p>
           <Button variant="outline" onClick={() => navigate('/templates')}>
@@ -41,13 +41,17 @@ export default function Dashboard() {
       </div>
 
       {/* Recent Activity */}
-      <div className="bg-white p-6 rounded-lg border">
-        <h3 className="font-medium mb-4">Recent Activity</h3>
-        <div className="text-sm text-gray-500">
+      <div className="bg-white p-4 rounded-lg border">
+        <h3 className="font-medium mb-1.5">Recent Activity</h3>
+        <div className="text-sm text-muted-foreground">
           View your quiz history to see recent activity.
         </div>
         <div className="mt-4">
-          <Button variant="link" onClick={() => navigate('/history')} className="px-0">
+          <Button 
+            variant="link" 
+            onClick={() => navigate('/history')} 
+            className="px-0 text-[rgb(79,70,229)] hover:text-[rgb(79,70,229)]/90"
+          >
             View History →
           </Button>
         </div>
