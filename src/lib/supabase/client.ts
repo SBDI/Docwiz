@@ -12,10 +12,15 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
   auth: {
     persistSession: true,
     autoRefreshToken: true,
-    detectSessionInUrl: true
+    detectSessionInUrl: false, // Disable automatic URL detection
   },
   db: {
     schema: 'public'
+  },
+  global: {
+    headers: {
+      'X-Client-Info': 'docwiz'
+    }
   }
 })
 
@@ -71,7 +76,15 @@ export const queries = {
         .from('quizzes')
         .select(`
           *,
-          questions (*)
+          questions:questions(
+            id,
+            type,
+            question,
+            options,
+            correct_answer,
+            explanation,
+            order_index
+          )
         `)
         .eq('id', quizId)
         .single()
@@ -79,35 +92,58 @@ export const queries = {
       if (error) throw error
       return data
     },
-    saveQuiz: async (quiz: Omit<Database['public']['Tables']['quizzes']['Insert'], 'id'> & { questions?: Array<Omit<Database['public']['Tables']['questions']['Insert'], 'id' | 'quiz_id'>> }) => {
-      const { data: quizData, error: quizError } = await supabase
-        .from('quizzes')
-        .insert({
-          title: quiz.title,
-          description: quiz.description ?? null,
-          user_id: quiz.user_id,
-          is_public: quiz.is_public ?? false
-        })
-        .select()
-        .single()
-      
-      if (quizError) throw quizError
+    saveQuiz: async (quiz: Omit<Database['public']['Tables']['quizzes']['Insert'], 'id'> & { 
+      questions?: Array<Omit<Database['public']['Tables']['questions']['Insert'], 'id' | 'quiz_id'>> 
+    }) => {
+      const { questions, ...quizData } = quiz;
 
-      if (quiz.questions?.length) {
+      // Insert quiz
+      const { data: savedQuiz, error: quizError } = await supabase
+        .from('quizzes')
+        .insert(quizData)
+        .select()
+        .single();
+
+      if (quizError) throw quizError;
+      if (!savedQuiz) throw new Error('Failed to save quiz');
+
+      if (questions && questions.length > 0) {
+        // Prepare questions with quiz_id
+        const questionsWithQuizId = questions.map((q, index) => ({
+          ...q,
+          quiz_id: savedQuiz.id,
+          order_index: index,
+          explanation: q.explanation || null // Ensure explanation is handled
+        }));
+
+        // Insert questions
         const { error: questionsError } = await supabase
           .from('questions')
-          .insert(
-            quiz.questions.map((q, index) => ({
-              ...q,
-              quiz_id: quizData.id,
-              order_index: q.order_index ?? index
-            }))
-          )
-        
-        if (questionsError) throw questionsError
+          .insert(questionsWithQuizId);
+
+        if (questionsError) throw questionsError;
       }
 
-      return quizData
+      // Return complete quiz with questions
+      const { data: completeQuiz, error: fetchError } = await supabase
+        .from('quizzes')
+        .select(`
+          *,
+          questions:questions(
+            id,
+            type,
+            question,
+            options,
+            correct_answer,
+            explanation,
+            order_index
+          )
+        `)
+        .eq('id', savedQuiz.id)
+        .single();
+
+      if (fetchError) throw fetchError;
+      return completeQuiz;
     },
     updateQuiz: async (quizId: string, updates: Database['public']['Tables']['quizzes']['Update']) => {
       const { data, error } = await supabase
@@ -128,6 +164,16 @@ export const queries = {
       
       if (error) throw error
     }
+  },
+  questions: {
+    updateExplanation: async (questionId: string, explanation: string) => {
+      const { error } = await supabase
+        .from('questions')
+        .update({ explanation })
+        .eq('id', questionId);
+
+      if (error) throw error;
+    },
   },
   templates: {
     getTemplates: async (filters?: { category?: string; difficulty?: string }) => {

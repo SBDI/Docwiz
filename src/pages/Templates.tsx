@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
-import { useAuth } from "@/lib/AuthContext"
+import { useAuth } from "@/lib/auth"
 import { TemplateCard } from "@/components/templates/TemplateCard"
 import { TemplatePreview } from "@/components/templates/TemplatePreview"
 import { queries } from "@/lib/supabase/client"
@@ -138,4 +138,4 @@ export default function Templates() {
       />
     </div>
   )
-} 
+}

@@ -72,6 +72,7 @@ export interface Database {
           question: string
           options: Json | null
           correct_answer: string
+          explanation: string | null
           order_index: number
           created_at: string
           updated_at: string
@@ -83,6 +84,7 @@ export interface Database {
           question: string
           options?: Json | null
           correct_answer: string
+          explanation?: string | null
           order_index: number
           created_at?: string
           updated_at?: string
@@ -94,6 +96,7 @@ export interface Database {
           question?: string
           options?: Json | null
           correct_answer?: string
+          explanation?: string | null
           order_index?: number
           created_at?: string
           updated_at?: string

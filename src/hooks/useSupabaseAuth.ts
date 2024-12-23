@@ -8,26 +8,47 @@ export function useSupabaseAuth() {
   const [error, setError] = useState<AuthError | null>(null)
 
   useEffect(() => {
+    let mounted = true
+
     // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null)
-      setLoading(false)
-    })
+    const getInitialSession = async () => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession()
+        if (error) throw error
+        if (mounted) {
+          setUser(session?.user ?? null)
+        }
+      } catch (error) {
+        if (mounted) {
+          setError(error as AuthError)
+        }
+      } finally {
+        if (mounted) {
+          setLoading(false)
+        }
+      }
+    }
+
+    getInitialSession()
 
     // Listen for auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null)
-      setLoading(false)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (mounted) {
+        setUser(session?.user ?? null)
+        setLoading(false)
+      }
     })
 
-    return () => subscription.unsubscribe()
+    return () => {
+      mounted = false
+      subscription.unsubscribe()
+    }
   }, [])
 
   const signIn = async (email: string, password: string) => {
     try {
       setError(null)
+      setLoading(true)
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -36,12 +57,15 @@ export function useSupabaseAuth() {
     } catch (err) {
       setError(err as AuthError)
       throw err
+    } finally {
+      setLoading(false)
     }
   }
 
   const signUp = async (email: string, password: string) => {
     try {
       setError(null)
+      setLoading(true)
       const { error } = await supabase.auth.signUp({
         email,
         password,
@@ -50,17 +74,23 @@ export function useSupabaseAuth() {
     } catch (err) {
       setError(err as AuthError)
       throw err
+    } finally {
+      setLoading(false)
     }
   }
 
   const signOut = async () => {
     try {
       setError(null)
+      setLoading(true)
       const { error } = await supabase.auth.signOut()
       if (error) throw error
+      setUser(null)
     } catch (err) {
       setError(err as AuthError)
       throw err
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -72,4 +102,4 @@ export function useSupabaseAuth() {
     signUp,
     signOut,
   }
-} 
+}

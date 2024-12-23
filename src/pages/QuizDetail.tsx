@@ -1,12 +1,11 @@
 import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useAuth } from '@/lib/AuthContext';
+import { useAuth } from '@/lib/auth/AuthProvider';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 
 const QuizDetail = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { id } = useParams();
 
   // Redirect if not authenticated
   if (!user) {
@@ -26,7 +25,7 @@ const QuizDetail = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle>Quiz #{id}</CardTitle>
+            <CardTitle>Quiz #{useParams().id}</CardTitle>
             <CardDescription>Quiz details and questions</CardDescription>
           </CardHeader>
           <CardContent>
@@ -39,4 +38,4 @@ const QuizDetail = () => {
   );
 };
 
-export default QuizDetail; 
+export default QuizDetail;

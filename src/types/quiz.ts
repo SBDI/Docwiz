@@ -13,6 +13,7 @@ export type Question = {
   options: string[] | null
   correct_answer: string
   order_index: number
+  explanation?: string
 }
 
 export type QuizCreationData = Omit<Database['public']['Tables']['quizzes']['Insert'], 'id'> & {

@@ -1,79 +1,102 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import { AuthProvider } from "@/lib/AuthContext";
-import ProtectedRoute from "@/components/auth/ProtectedRoute";
-import ErrorBoundary from '@/components/ErrorBoundary';
-import Navbar from "@/components/layout/Navbar";
+import ErrorBoundary from "@/components/ErrorBoundary";
+import { Toaster } from "@/components/ui/toaster";
+import { AuthProvider } from "@/lib/auth";
+import { AppLayout } from "@/components/layout/AppLayout";
+import ProtectedRoute from "@/components/ProtectedRoute";
+
+// Pages
+import Index from "@/pages/Index";
+import SignIn from "@/pages/SignIn";
+import SignUp from "@/pages/SignUp";
 import Dashboard from "@/pages/Dashboard";
 import CreateQuiz from "@/pages/CreateQuiz";
-import SignIn from "@/pages/SignIn";
-import Index from "@/pages/Index";
 import Templates from "@/pages/Templates";
-import SignUp from "@/pages/SignUp";
 import QuizEditor from "@/pages/QuizEditor";
-import { Toaster } from "@/components/ui/toaster"
-import { SkipLink } from "@/components/ui/skip-link"
+import History from "@/pages/History";
+import QuizView from "@/pages/QuizView";
 
-const App = () => {
+function App() {
   return (
     <Router>
-      <ErrorBoundary>
-        <AuthProvider>
-          <div className="min-h-screen flex flex-col bg-background">
-            <SkipLink />
-            <header role="banner">
-              <Navbar />
-            </header>
-            <main id="main-content" role="main" className="flex-1" tabIndex={-1}>
-              <Routes>
-                {/* Public routes */}
-                <Route path="/" element={<Index />} />
-                <Route path="/sign-in" element={<SignIn />} />
-                <Route path="/sign-up" element={<SignUp />} />
-                
-                {/* Protected routes */}
-                <Route
-                  path="/dashboard"
-                  element={
-                    <ProtectedRoute>
-                      <Dashboard />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/create"
-                  element={
-                    <ProtectedRoute>
-                      <CreateQuiz />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/templates"
-                  element={
-                    <ProtectedRoute>
-                      <Templates />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/quiz/:quizId/edit"
-                  element={
-                    <ProtectedRoute>
-                      <QuizEditor />
-                    </ProtectedRoute>
-                  }
-                />
-                
-                {/* Catch all route */}
-                <Route path="*" element={<Navigate to="/" replace />} />
-              </Routes>
-            </main>
-            <Toaster />
-          </div>
-        </AuthProvider>
-      </ErrorBoundary>
+      <AuthProvider>
+        <ErrorBoundary>
+          <Routes>
+            {/* Public routes */}
+            <Route path="/" element={<Index />} />
+            <Route path="/sign-in" element={<SignIn />} />
+            <Route path="/sign-up" element={<SignUp />} />
+            
+            {/* Protected routes - wrapped in AppLayout */}
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <AppLayout>
+                    <Dashboard />
+                  </AppLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/create"
+              element={
+                <ProtectedRoute>
+                  <AppLayout>
+                    <CreateQuiz />
+                  </AppLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/templates"
+              element={
+                <ProtectedRoute>
+                  <AppLayout>
+                    <Templates />
+                  </AppLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/quiz/:quizId"
+              element={
+                <ProtectedRoute>
+                  <AppLayout>
+                    <QuizView />
+                  </AppLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/quiz/:quizId/edit"
+              element={
+                <ProtectedRoute>
+                  <AppLayout>
+                    <QuizEditor />
+                  </AppLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/history"
+              element={
+                <ProtectedRoute>
+                  <AppLayout>
+                    <History />
+                  </AppLayout>
+                </ProtectedRoute>
+              }
+            />
+            
+            {/* Catch all route */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+          <Toaster />
+        </ErrorBoundary>
+      </AuthProvider>
     </Router>
   );
-};
+}
 
 export default App;
