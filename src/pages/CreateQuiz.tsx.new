@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
@@ -242,10 +242,9 @@ export default function CreateQuiz() {
                   setNumOptions('2');
                 }
               }}
-              disabled={isLoading}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Select question type" />
+                <SelectValue />
               </SelectTrigger>
               <SelectContent>
                 {QUESTION_TYPES.map((type) => (
@@ -262,10 +261,9 @@ export default function CreateQuiz() {
             <Select
               value={difficulty}
               onValueChange={(value: DifficultyLevel) => setDifficulty(value)}
-              disabled={isLoading}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Select difficulty" />
+                <SelectValue />
               </SelectTrigger>
               <SelectContent>
                 {DIFFICULTY_LEVELS.map((level) => (
@@ -279,14 +277,13 @@ export default function CreateQuiz() {
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium">Output Language</label>
+          <label className="text-sm font-medium">Language</label>
           <Select
             value={language}
             onValueChange={(value: Language) => setLanguage(value)}
-            disabled={isLoading}
           >
             <SelectTrigger>
-              <SelectValue placeholder="Select language" />
+              <SelectValue />
             </SelectTrigger>
             <SelectContent>
               {LANGUAGES.map((lang) => (
@@ -301,7 +298,7 @@ export default function CreateQuiz() {
         <div className="space-y-2">
           <label className="text-sm font-medium">Description (Optional)</label>
           <Textarea
-            placeholder="Specify key knowledge points or skills this quiz aims to assess."
+            placeholder="Add a description for your quiz..."
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             disabled={isLoading}
@@ -311,13 +308,13 @@ export default function CreateQuiz() {
         <Button
           className="w-full"
           onClick={handleGenerate}
-          disabled={isLoading}
+          disabled={isLoading || !content.trim()}
         >
           {isLoading ? (
-            <>Generating...</>
+            "Generating..."
           ) : (
             <>
-              Generate
+              Generate Quiz
               <ArrowRight className="ml-2 h-4 w-4" />
             </>
           )}
@@ -325,4 +322,4 @@ export default function CreateQuiz() {
       </div>
     </div>
   );
-}
+} 
