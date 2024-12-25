@@ -13,7 +13,7 @@ Instructions for questions:
 2. Match the specified question type format:
    - Multiple Choice (MCQ): {numberOfOptions} options with one correct answer
    - True/False: Two options (True/False)
-   - Fill in the Blank: One correct answer with clear context
+   - Fill in the Blank: One clear blank to fill with a specific word or phrase (no options needed)
 3. Be clear and unambiguous
 4. Match the specified difficulty level
 
@@ -28,10 +28,16 @@ Content: {content}
 Return as a JSON array of questions, where each question has:
 {
   "question": "The question text",
-  "options": ["A) First option", "B) Second option", ...], // For MCQ and True/False only
+  "options": ["A) First option", "B) Second option", ...], // For MCQ and True/False only, omit for Fill in the Blank
   "correct_answer": "The correct answer",
   "explanation": "Clear explanation of why the answer is correct"
-}`;
+}
+
+For Fill in the Blank questions:
+1. Use "_____" to indicate the blank in the question
+2. The correct_answer should be the exact word or phrase that fits in the blank
+3. Do not include options array
+4. Example: { "question": "The capital of France is _____.", "correct_answer": "Paris" }`;
 
 export interface GenerateQuizOptions {
   content: string;

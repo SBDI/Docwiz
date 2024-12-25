@@ -39,7 +39,7 @@ const PricingTier = ({ name, price, features, recommended = false }) => (
 );
 
 const HowItWorks = () => (
-  <div className="py-24 bg-gradient-to-b from-white to-gray-50">
+  <div className="py-24">
     <div className="container mx-auto px-4">
       <div className="text-center mb-16">
         <h2 className="text-3xl font-bold text-gray-900 mb-4">How It Works</h2>
@@ -50,7 +50,7 @@ const HowItWorks = () => (
 
       <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
         {/* Step 1 */}
-        <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
+        <div className="bg-white/50 backdrop-blur-sm rounded-2xl p-8 border border-gray-200">
           <div className="mb-6">
             <span className="inline-block text-sm font-semibold text-indigo-600 bg-indigo-50 rounded-full px-3 py-1">
               Step 1: Upload
@@ -85,25 +85,19 @@ const HowItWorks = () => (
         </div>
 
         {/* Step 2 */}
-        <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
+        <div className="bg-white/50 backdrop-blur-sm rounded-2xl p-8 border border-gray-200">
           <div className="mb-6">
             <span className="inline-block text-sm font-semibold text-indigo-600 bg-indigo-50 rounded-full px-3 py-1">
-              Step 2: That's it
+              Step 2: Generate
             </span>
           </div>
           <h3 className="text-xl font-semibold text-gray-900 mb-4">
-            Share or Export
+            Generate & Customize
           </h3>
           <p className="text-gray-600 mb-6">
-            Complete your quiz or share it with as many people as you like. You can also edit or export your quiz.
+            Our AI analyzes your content and generates relevant questions. Edit, customize, and share your quiz.
           </p>
           <div className="flex flex-wrap gap-3">
-            <span className="inline-flex items-center text-sm text-gray-600 bg-gray-100 rounded-full px-3 py-1">
-              <svg className="w-4 h-4 mr-1.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-              </svg>
-              Share
-            </span>
             <span className="inline-flex items-center text-sm text-gray-600 bg-gray-100 rounded-full px-3 py-1">
               <svg className="w-4 h-4 mr-1.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -159,9 +153,9 @@ const Index = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            From a document to a 
+            From document to Quiz
             <br />
-            <span className="text-indigo-600">Wiz in Seconds 📋</span>
+            <span className="text-indigo-600">in Seconds 📋</span>
           </motion.h1>
           <motion.p 
             className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto"
@@ -169,7 +163,7 @@ const Index = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
           >
-            Transform any document into an interactive quiz instantly.
+            Transform your documents and topics into interactive quizzes instantly.
             Perfect for teachers, trainers, and content creators.
           </motion.p>
           <motion.div

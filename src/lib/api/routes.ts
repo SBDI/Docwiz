@@ -4,9 +4,10 @@ import { z } from 'zod'
 export const API_ROUTES = {
   quiz: {
     generate: '/api/quiz/generate',  // Generate quiz from content
-    create: '/api/quiz',            // Save generated quiz
+    create: '/api/quiz/create',            // Save generated quiz
     get: (id: string) => `/api/quiz/${id}`,  // Get quiz details
     attempt: (id: string) => `/api/quiz/${id}/attempt`,  // Submit quiz attempt
+    export: (id: string) => `/api/quiz/${id}/export`,
   },
   templates: {
     list: '/api/templates',  // List available templates

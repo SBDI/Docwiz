@@ -12,7 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { aiClient } from "@/lib/ai-client";
 import { useQuiz } from "@/hooks/useQuiz";
@@ -147,6 +147,15 @@ export default function CreateQuiz() {
     }
   };
 
+  const handleQuestionTypeChange = (value: QuestionType) => {
+    setQuestionType(value);
+    if (value === 'true-false') {
+      setNumOptions('2');
+    } else if (value === 'fill-in-blank') {
+      setNumOptions('1');
+    }
+  };
+
   return (
     <div className="container max-w-2xl mx-auto py-8 space-y-8">
       <div className="space-y-4">
@@ -227,7 +236,13 @@ export default function CreateQuiz() {
               value={numOptions}
               onChange={(e) => setNumOptions(e.target.value)}
               disabled={isLoading || questionType !== 'multiple-choice'}
+              className={questionType === 'fill-in-blank' ? 'opacity-50' : ''}
             />
+            {questionType === 'fill-in-blank' && (
+              <p className="text-xs text-muted-foreground">
+                Not applicable for fill-in-blank questions
+              </p>
+            )}
           </div>
         </div>
 
@@ -236,23 +251,22 @@ export default function CreateQuiz() {
             <label className="text-sm font-medium">Question Type</label>
             <Select
               value={questionType}
-              onValueChange={(value: QuestionType) => {
-                setQuestionType(value);
-                if (value === 'true-false') {
-                  setNumOptions('2');
-                }
-              }}
+              onValueChange={handleQuestionTypeChange}
               disabled={isLoading}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select question type" />
               </SelectTrigger>
               <SelectContent>
-                {QUESTION_TYPES.map((type) => (
-                  <SelectItem key={type} value={type}>
-                    {QUESTION_TYPE_LABELS[type]}
-                  </SelectItem>
-                ))}
+                <SelectItem value="multiple-choice">
+                  {QUESTION_TYPE_LABELS['multiple-choice']}
+                </SelectItem>
+                <SelectItem value="true-false">
+                  {QUESTION_TYPE_LABELS['true-false']}
+                </SelectItem>
+                <SelectItem value="fill-in-blank">
+                  {QUESTION_TYPE_LABELS['fill-in-blank']}
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -311,15 +325,18 @@ export default function CreateQuiz() {
         <Button
           className="w-full"
           onClick={handleGenerate}
-          disabled={isLoading}
+          disabled={isLoading || !content.trim()}
         >
           {isLoading ? (
-            <>Generating...</>
+            <div className="flex items-center gap-2">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              <span>Generating your quiz...</span>
+            </div>
           ) : (
-            <>
-              Generate
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </>
+            <div className="flex items-center">
+              <span>Generate Quiz</span>
+              <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+            </div>
           )}
         </Button>
       </div>

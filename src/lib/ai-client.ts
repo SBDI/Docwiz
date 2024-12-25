@@ -105,17 +105,20 @@ const validateQuestion = (q: any, index: number, type: QuestionType): QuestionGe
     throw new Error(`Question ${index + 1} is missing or invalid`);
   }
 
-  if (!Array.isArray(q.options) || q.options.length < 2) {
-    throw new Error(`Question ${index + 1} has invalid options`);
-  }
-
   if (!q.correct_answer || typeof q.correct_answer !== 'string') {
     throw new Error(`Question ${index + 1} is missing correct answer`);
   }
 
+  // Only require options for multiple-choice and true-false questions
+  if (type !== 'fill-in-blank') {
+    if (!Array.isArray(q.options) || q.options.length < 2) {
+      throw new Error(`Question ${index + 1} has invalid options`);
+    }
+  }
+
   const validatedQuestion: QuestionGeneration = {
     question: q.question,
-    options: q.options.map(opt => typeof opt === 'string' ? opt : opt.text || opt.value || String(opt)),
+    options: type === 'fill-in-blank' ? null : q.options.map(opt => typeof opt === 'string' ? opt : opt.text || opt.value || String(opt)),
     correct_answer: q.correct_answer,
     explanation: q.explanation || `Explanation for question ${index + 1}`
   };

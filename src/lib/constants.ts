@@ -35,7 +35,8 @@ export const LANGUAGES = [
   'French',
   'German',
   'Chinese',
-  'Japanese'
+  'Japanese',
+  'Arabic'
 ] as const
 
 export type Language = typeof LANGUAGES[number]
