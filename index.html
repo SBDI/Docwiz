@@ -3,24 +3,34 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>quizly-spark</title>
-    <meta name="description" content="Lovable Generated Project" />
-    <meta name="author" content="Lovable" />
+    <link rel="icon" href="/favicon.png" type="image/png" />
+    <title>Docwiz</title>
+    <meta name="description" content="A project for managing quizzes and questions." />
+    <meta name="author" content="" />
     <meta property="og:image" content="/og-image.png" />
   </head>
 
   <body>
     <div id="root"></div>
-    <script>
-      window.addEventListener('message', function(event) {
-        // Verify the origin
-        if (event.origin !== 'https://cdn.gpteng.co') {
-          return;
-        }
-        // Handle the message
-      }, false);
-    </script>
-    <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
+
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+        const translations = {
+            en: {
+                title: "Docwiz",
+                description: "A project for managing quizzes and questions.",
+            },
+            fr: {
+                title: "Docwiz",
+                description: "Un projet pour gérer des quiz et des questions.",
+            },
+            ar: {
+                title: "دوكويز",
+                description: "مشروع لإدارة الاختبارات والأسئلة.",
+            },
+        };
+
+        // Removed language selector functionality
+    </script>
   </body>
 </html>

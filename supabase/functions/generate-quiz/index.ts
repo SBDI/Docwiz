@@ -1,5 +1,4 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 interface GenerateQuizRequest {
   content: string
@@ -11,11 +10,12 @@ const OLLAMA_URL = 'http://localhost:11434'
 
 serve(async (req) => {
   try {
-    const { content, userId, title } = await req.json() as GenerateQuizRequest
-    const supabase = createClient(
-      Deno.env.get('VITE_SUPABASE_URL') ?? '',
-      Deno.env.get('VITE_SUPABASE_ANON_KEY') ?? ''
-    )
+    const { content } = await req.json() as GenerateQuizRequest
+
+    // Removed unused variables
+    // const userId = ...
+    // const title = ...
+    // const supabase = ...
 
     // Generate quiz using Ollama
     const response = await fetch(`${OLLAMA_URL}/api/generate`, {
@@ -46,4 +46,4 @@ serve(async (req) => {
       { status: 400, headers: { 'Content-Type': 'application/json' } }
     )
   }
-}) 
+})

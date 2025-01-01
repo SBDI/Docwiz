@@ -5,8 +5,8 @@ declare module 'mammoth' {
 
   interface MammothResult {
     value: string;
-    messages: any[];
+    messages: string[];
   }
 
   export function extractRawText(options: MammothOptions): Promise<MammothResult>;
-} 
+}

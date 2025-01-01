@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "build:dev": "vite build --mode development",
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "lint": "eslint . --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -62,6 +62,7 @@
     "react": "^18.3.1",
     "react-day-picker": "^8.10.1",
     "react-dom": "^18.3.1",
+    "react-dropzone": "^14.3.5",
     "react-error-boundary": "^5.0.0",
     "react-hook-form": "^7.54.0",
     "react-hotkeys-hook": "^4.6.1",
@@ -70,6 +71,7 @@
     "recharts": "^2.15.0",
     "sonner": "^1.7.1",
     "stripe": "^17.4.0",
+    "supabase": "^2.1.1",
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7",
     "uuid": "^11.0.3",
@@ -77,7 +79,7 @@
     "zod": "^3.24.1"
   },
   "devDependencies": {
-    "@eslint/js": "^9.9.0",
+    "@eslint/js": "^9.17.0",
     "@tailwindcss/typography": "^0.5.15",
     "@types/classnames": "^2.3.0",
     "@types/react": "^18.3.3",
@@ -87,16 +89,16 @@
     "@vitejs/plugin-react-swc": "^3.5.0",
     "autoprefixer": "^10.4.20",
     "concurrently": "^8.2.2",
-    "eslint": "^9.9.0",
+    "eslint": "^9.17.0",
+    "eslint-plugin-react": "^7.37.3",
     "eslint-plugin-react-hooks": "^5.1.0-rc.0",
     "eslint-plugin-react-refresh": "^0.4.9",
-    "globals": "^15.9.0",
-    "lovable-tagger": "^1.0.19",
+    "globals": "^15.14.0",
     "postcss": "^8.4.47",
     "postcss-import": "^16.1.0",
     "tailwindcss": "^3.4.11",
     "typescript": "^5.5.3",
-    "typescript-eslint": "^8.0.1",
+    "typescript-eslint": "^8.18.2",
     "vite": "^5.4.1"
   }
 }

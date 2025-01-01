@@ -1,3 +1,4 @@
+import React from 'react';
 import { Quiz } from '@/types/quiz';
 import { format } from 'date-fns';
 import { 
@@ -20,4 +21,4 @@ export const QuizCard = ({ quiz, onView, isNavigating }: QuizCardProps) => {
       {/* ... existing quiz card content ... */}
     </div>
   );
-}; 
+};
