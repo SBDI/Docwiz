@@ -1,6 +1,6 @@
 import { ChatCompletionResponse, AIConfig } from '@/types/ai';
 import { config } from '@/config';
-import type { Question } from '@/types/quiz';
+import type { Question, UIQuestionType } from '@/types/quiz';
 import { QUIZ_GENERATION_PROMPT, replacePromptVariables, QuestionGeneration } from './prompts';
 import { 
   QuestionType, 
@@ -175,7 +175,7 @@ export const aiClient = {
         ...validateQuestion(q, i, options.questionType),
         id: `temp-${i}`,
         quiz_id: '',
-        type: options.questionType,
+        type: options.questionType as UIQuestionType,
         order_index: i
       }));
     } catch (error) {
