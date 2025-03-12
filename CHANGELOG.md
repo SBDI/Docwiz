@@ -1,5 +1,26 @@
 # Changelog
 
+## [1.3.0] - 2024-03-11
+
+### Added
+- Development mode credit bypass system
+- Mock quiz storage in localStorage for development
+- Enhanced Supabase client configuration with proper headers
+- Improved error handling and data validation
+
+### Changed
+- Updated quiz creation flow to handle credits more reliably
+- Improved data consistency with proper timestamps
+- Enhanced type safety across quiz operations
+- Modified Supabase client to use explicit field selection
+
+### Technical
+- Added `VITE_DEV_BYPASS_CREDITS` environment variable
+- Improved error handling in quiz creation
+- Added transaction-like behavior for quiz and questions creation
+- Enhanced data validation for required fields
+- Updated Supabase client headers for better request handling
+
 ## [1.2.0] - 2024-12-22
 
 ### Added

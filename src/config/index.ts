@@ -3,7 +3,7 @@ export const config = {
   ai: {
     model: 'mixtral-8x7b-32768', // Using one of Groq's available models
     apiKey: import.meta.env.VITE_GROQ_API_KEY,
-    baseUrl: 'https://api.groq.com/v1'
+    baseUrl: 'https://api.groq.com/openai/v1'
   },
   supabase: {
     url: import.meta.env.VITE_SUPABASE_URL,

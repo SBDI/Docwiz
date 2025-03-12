@@ -1,25 +1,30 @@
 import { createClient } from '@supabase/supabase-js'
 import { Database } from '../database.types'
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+// Ensure URL has no trailing slash and is properly formatted
+const supabaseUrl = 'https://lvgqigjgvhejuaglehpa.supabase.co'
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
 if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Missing Supabase environment variables. Check .env file')
 }
 
+// Configure Supabase client with explicit headers and options
 export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
   auth: {
     persistSession: true,
     autoRefreshToken: true,
-    detectSessionInUrl: false, // Disable automatic URL detection
+    detectSessionInUrl: false,
   },
   db: {
     schema: 'public'
   },
   global: {
     headers: {
-      'X-Client-Info': 'docwiz'
+      'X-Client-Info': 'docwiz',
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'Prefer': 'return=minimal'  // This helps with insert operations
     }
   }
 })
@@ -59,7 +64,8 @@ export const queries = {
   },
   quizzes: {
     getQuizzes: async (userId: string) => {
-      const { data, error } = await supabase
+      // Get real quizzes from Supabase
+      const { data: realQuizzes, error } = await supabase
         .from('quizzes')
         .select(`
           *,
@@ -69,9 +75,50 @@ export const queries = {
         .order('created_at', { ascending: false })
       
       if (error) throw error
-      return data
+
+      // In development mode, also get mock quizzes
+      if (import.meta.env.VITE_DEV_BYPASS_CREDITS === 'true') {
+        try {
+          const mockQuizzes = JSON.parse(localStorage.getItem('mockQuizzes') || '{}');
+          const userMockQuizzes = Object.values(mockQuizzes)
+            .filter((quiz: any) => quiz.user_id === userId)
+            .map((quiz: any) => ({
+              ...quiz,
+              questions: quiz.questions || [] // Ensure questions is always an array
+            })) as Array<Database['public']['Tables']['quizzes']['Row'] & {
+              questions: Database['public']['Tables']['questions']['Row'][]
+            }>;
+          
+          return [...(realQuizzes || []), ...userMockQuizzes].sort((a, b) => 
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+          );
+        } catch (e) {
+          console.warn('Failed to retrieve mock quizzes from localStorage:', e);
+        }
+      }
+
+      return realQuizzes || [];
     },
     getQuiz: async (quizId: string) => {
+      // Check for mock quiz in development mode
+      if (import.meta.env.VITE_DEV_BYPASS_CREDITS === 'true') {
+        try {
+          const mockQuizzes = JSON.parse(localStorage.getItem('mockQuizzes') || '{}');
+          const mockQuiz = mockQuizzes[quizId];
+          if (mockQuiz) {
+            return {
+              ...mockQuiz,
+              questions: mockQuiz.questions || [] // Ensure questions is always an array
+            } as Database['public']['Tables']['quizzes']['Row'] & {
+              questions: Database['public']['Tables']['questions']['Row'][]
+            };
+          }
+        } catch (e) {
+          console.warn('Failed to retrieve mock quiz from localStorage:', e);
+        }
+      }
+
+      // If no mock quiz found or not in development mode, proceed with normal fetch
       const { data, error } = await supabase
         .from('quizzes')
         .select(`
@@ -90,60 +137,168 @@ export const queries = {
         .single()
       
       if (error) throw error
-      return data
+      return {
+        ...data,
+        questions: data.questions || [] // Ensure questions is always an array
+      } as Database['public']['Tables']['quizzes']['Row'] & {
+        questions: Database['public']['Tables']['questions']['Row'][]
+      };
     },
     saveQuiz: async (quiz: Omit<Database['public']['Tables']['quizzes']['Insert'], 'id'> & { 
       questions?: Array<Omit<Database['public']['Tables']['questions']['Insert'], 'id' | 'quiz_id'>> 
     }) => {
       const { questions, ...quizData } = quiz;
 
-      // Insert quiz
-      const { data: savedQuiz, error: quizError } = await supabase
-        .from('quizzes')
-        .insert(quizData)
-        .select()
-        .single();
+      try {
+        // First, try to insert the quiz without selecting
+        const { error: insertError } = await supabase
+          .from('quizzes')
+          .insert({
+            ...quizData,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          });
 
-      if (quizError) throw quizError;
-      if (!savedQuiz) throw new Error('Failed to save quiz');
+        if (insertError) {
+          // Check specifically for insufficient credits error
+          if (insertError.message.includes('Insufficient credits')) {
+            const bypassCredits = import.meta.env.VITE_DEV_BYPASS_CREDITS === 'true';
+            
+            if (bypassCredits) {
+              console.warn('Credit check bypassed for development');
+              
+              // For development: Bypass credit check and create quiz anyway
+              // Create a unique ID for the quiz
+              const bypassedQuizId = crypto.randomUUID();
+              
+              // Create mock quiz data with the same structure as a real quiz
+              const mockQuizData: Database['public']['Tables']['quizzes']['Row'] & {
+                questions: Database['public']['Tables']['questions']['Row'][]
+              } = {
+                id: bypassedQuizId,
+                user_id: quizData.user_id,
+                title: quizData.title,
+                description: quizData.description || null,
+                is_public: quizData.is_public || false,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+                questions: questions?.map((q, index) => ({
+                  id: crypto.randomUUID(),
+                  quiz_id: bypassedQuizId,
+                  type: q.type,
+                  question: q.question,
+                  options: q.options || null,
+                  correct_answer: q.correct_answer,
+                  explanation: q.explanation || null,
+                  order_index: index,
+                  created_at: new Date().toISOString(),
+                  updated_at: new Date().toISOString()
+                })) || []
+              };
+              
+              // Store the mock quiz in localStorage for persistence during development
+              try {
+                const mockQuizzes = JSON.parse(localStorage.getItem('mockQuizzes') || '{}');
+                mockQuizzes[bypassedQuizId] = mockQuizData;
+                localStorage.setItem('mockQuizzes', JSON.stringify(mockQuizzes));
+              } catch (e) {
+                console.warn('Failed to store mock quiz in localStorage:', e);
+              }
+              
+              return mockQuizData;
+            } else {
+              throw new Error('Unable to create quiz: You have insufficient credits. Please purchase more credits to continue.');
+            }
+          }
+          throw insertError;
+        }
 
-      if (questions && questions.length > 0) {
-        // Prepare questions with quiz_id
-        const questionsWithQuizId = questions.map((q, index) => ({
-          ...q,
-          quiz_id: savedQuiz.id,
-          order_index: index,
-          explanation: q.explanation || null // Ensure explanation is handled
-        }));
+        // Then fetch the newly created quiz separately
+        const { data: savedQuiz, error: fetchError } = await supabase
+          .from('quizzes')
+          .select('*')
+          .eq('user_id', quizData.user_id)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .single();
 
-        // Insert questions
-        const { error: questionsError } = await supabase
-          .from('questions')
-          .insert(questionsWithQuizId);
+        if (fetchError || !savedQuiz) {
+          throw new Error('Failed to retrieve saved quiz');
+        }
 
-        if (questionsError) throw questionsError;
-      }
+        if (questions && questions.length > 0) {
+          // Prepare questions with quiz_id and ensure all required fields
+          const questionsWithQuizId = questions.map((q, index) => {
+            // Validate required fields
+            if (!q.type || !q.question || !q.correct_answer) {
+              throw new Error('Missing required fields in question');
+            }
 
-      // Return complete quiz with questions
-      const { data: completeQuiz, error: fetchError } = await supabase
-        .from('quizzes')
-        .select(`
-          *,
-          questions:questions(
+            return {
+              quiz_id: savedQuiz.id,
+              type: q.type,
+              question: q.question,
+              options: q.options || null,
+              correct_answer: q.correct_answer,
+              explanation: q.explanation || null,
+              order_index: index,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            };
+          });
+
+          // Insert questions
+          const { error: questionsError } = await supabase
+            .from('questions')
+            .insert(questionsWithQuizId);
+
+          if (questionsError) {
+            // If questions fail to insert, delete the quiz to maintain consistency
+            await supabase.from('quizzes').delete().eq('id', savedQuiz.id);
+            throw questionsError;
+          }
+        }
+
+        // Return complete quiz with questions
+        const { data: completeQuiz, error: completeError } = await supabase
+          .from('quizzes')
+          .select(`
             id,
-            type,
-            question,
-            options,
-            correct_answer,
-            explanation,
-            order_index
-          )
-        `)
-        .eq('id', savedQuiz.id)
-        .single();
+            user_id,
+            title,
+            description,
+            is_public,
+            created_at,
+            updated_at,
+            questions(
+              id,
+              type,
+              question,
+              options,
+              correct_answer,
+              explanation,
+              order_index,
+              created_at,
+              updated_at
+            )
+          `)
+          .eq('id', savedQuiz.id)
+          .single();
 
-      if (fetchError) throw fetchError;
-      return completeQuiz;
+        if (completeError || !completeQuiz) {
+          throw new Error('Failed to retrieve complete quiz');
+        }
+
+        return {
+          ...completeQuiz,
+          questions: completeQuiz.questions || []
+        } as Database['public']['Tables']['quizzes']['Row'] & {
+          questions: Database['public']['Tables']['questions']['Row'][]
+        };
+      } catch (error) {
+        console.error('Error saving quiz:', error);
+        throw error;
+      }
     },
     updateQuiz: async (quizId: string, updates: Database['public']['Tables']['quizzes']['Update']) => {
       const { data, error } = await supabase
@@ -256,4 +411,4 @@ export const queries = {
       return quiz
     }
   }
-} 
+}

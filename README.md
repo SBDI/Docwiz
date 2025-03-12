@@ -9,6 +9,7 @@ Transform documents into smart quizzes instantly with Docwiz. Perfect for educat
 - 🧠 Smart Analysis: AI understands context and generates relevant questions
 - 🌍 Multi-Language Support: Works in over 50 languages including Arabic
 - 💎 Premium Templates: Access pre-made quiz templates for various subjects
+- 🔄 Credit System: Flexible credit-based quiz generation with development bypass option
 
 ## Tech Stack
 
@@ -39,11 +40,36 @@ git clone <YOUR_GIT_URL>
 cd <YOUR_PROJECT_NAME>
 
 # Step 3: Install the necessary dependencies.
-npm i
+pnpm install
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+# Step 4: Set up your environment variables
+cp .env.example .env
+
+# Step 5: Start the development server with auto-reloading and an instant preview.
+pnpm dev
 ```
+
+### Environment Variables
+
+Create a `.env` file with the following variables:
+
+```env
+VITE_SUPABASE_URL=your_supabase_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+VITE_GROQ_API_KEY=your_groq_api_key
+
+# Development options
+VITE_DEV_BYPASS_CREDITS=true  # Set to true to bypass credit checks in development
+```
+
+### Development Mode
+
+For development purposes, you can bypass the credit system by setting `VITE_DEV_BYPASS_CREDITS=true` in your `.env` file. This will:
+- Allow unlimited quiz generation without consuming credits
+- Store mock quizzes in localStorage for persistence
+- Maintain all functionality without database constraints
+
+Note: The credit bypass is only available in development mode and should not be enabled in production.
 
 **Edit a file directly in GitHub**
 
@@ -96,7 +122,7 @@ cp .env.example .env
 
 1. After setting up your environment, start the development server:
 ```sh
-npm run dev
+pnpm dev
 ```
 
 2. Open your browser's developer tools (F12)

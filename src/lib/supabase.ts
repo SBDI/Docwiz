@@ -1,10 +1,5 @@
-import { createClient } from '@supabase/supabase-js';
-
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-if (!supabaseUrl || !supabaseKey) {
-  throw new Error('Missing Supabase environment variables');
-}
-
-export const supabase = createClient(supabaseUrl, supabaseKey); 
+// This file is deprecated. Please use @/lib/supabase/client.ts instead.
+// This file is kept for backward compatibility.
+import { supabase } from './supabase/client';
+export { supabase };
+export { handleSupabaseError, queries } from './supabase/client'; 

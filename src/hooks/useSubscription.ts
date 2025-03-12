@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase/client';
 import { UserSubscription } from '@/types/subscription';
 
 export const useSubscription = (userId: string | undefined) => {
