@@ -1,159 +1,177 @@
-# Docwiz - AI-Powered Quiz Generator
+# 🎯 Docwiz - AI-Powered Quiz Generator
 
-Transform documents into smart quizzes instantly with Docwiz. Perfect for educators, trainers, and content creators.
+Docwiz is a modern SaaS platform that transforms any document into interactive quizzes using AI. Built for educators, trainers, and content creators who want to create engaging assessments quickly and efficiently.
 
-## Features
+## ✨ Features
 
-- 📄 Multiple Document Formats: Support for PDFs, docs, images, and text files
-- ⚡ Lightning Fast: Generate comprehensive quizzes in seconds with advanced AI
-- 🧠 Smart Analysis: AI understands context and generates relevant questions
-- 🌍 Multi-Language Support: Works in over 50 languages including Arabic
-- 💎 Premium Templates: Access pre-made quiz templates for various subjects
-- 🔄 Credit System: Flexible credit-based quiz generation with development bypass option
+- **📄 Smart Document Processing**
+  - Support for PDF, DOCX, TXT, and image files
+  - Intelligent text extraction and analysis
+  - Automatic content organization
 
-## Tech Stack
+- **🤖 AI-Powered Quiz Generation**
+  - Context-aware question creation
+  - Multiple question types support
+  - Customizable difficulty levels
+  - Automatic answer validation
 
-This project is built with modern web technologies:
+- **💼 Professional Tools**
+  - Custom quiz templates
+  - Bulk quiz generation
+  - Quiz analytics and insights
+  - Export options (PDF, CSV)
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-- Supabase
-- Framer Motion
-- X.AI API (Grok model) for quiz generation
+- **🔒 Enterprise-Grade Security**
+  - End-to-end encryption
+  - Role-based access control
+  - Data privacy compliance
+  - Secure document storage
 
-## Getting Started
+## 🚀 Quick Start
 
 ### Prerequisites
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+- Node.js 18+ (LTS recommended)
+- pnpm package manager
+- Git
 
-### Development Setup
+### Installation
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/docwiz.git
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+# Navigate to project directory
+cd docwiz
 
-# Step 3: Install the necessary dependencies.
+# Install dependencies
 pnpm install
 
-# Step 4: Set up your environment variables
+# Set up environment variables
 cp .env.example .env
 
-# Step 5: Start the development server with auto-reloading and an instant preview.
+# Start development server
 pnpm dev
 ```
 
-### Environment Variables
+### Environment Setup
 
 Create a `.env` file with the following variables:
 
 ```env
+# Supabase Configuration
 VITE_SUPABASE_URL=your_supabase_url
 VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+
+# AI Provider
 VITE_GROQ_API_KEY=your_groq_api_key
 
-# Development options
-VITE_DEV_BYPASS_CREDITS=true  # Set to true to bypass credit checks in development
+# Development Options
+VITE_DEV_BYPASS_CREDITS=true  # Enable for development only
 ```
 
-### Development Mode
+## 🛠️ Technology Stack
 
-For development purposes, you can bypass the credit system by setting `VITE_DEV_BYPASS_CREDITS=true` in your `.env` file. This will:
-- Allow unlimited quiz generation without consuming credits
-- Store mock quizzes in localStorage for persistence
-- Maintain all functionality without database constraints
+### Frontend
+- **Framework**: React 18 with TypeScript
+- **Styling**: Tailwind CSS + shadcn/ui
+- **State Management**: React Query
+- **Routing**: React Router 6
+- **Forms**: React Hook Form + Zod
 
-Note: The credit bypass is only available in development mode and should not be enabled in production.
+### Backend
+- **Database**: Supabase (PostgreSQL)
+- **Authentication**: Supabase Auth
+- **Storage**: Supabase Storage
+- **AI Integration**: Groq API
 
-**Edit a file directly in GitHub**
+### Development Tools
+- **Build Tool**: Vite
+- **Package Manager**: pnpm
+- **Testing**: Vitest + Testing Library
+- **Code Quality**: ESLint + Prettier
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## 🧪 Development Mode
 
-**Use GitHub Codespaces**
+### Credit System Bypass
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+For development purposes, you can bypass the credit system:
 
-## What technologies are used for this project?
+1. Set `VITE_DEV_BYPASS_CREDITS=true` in `.env`
+2. Mock quizzes will be stored in localStorage
+3. All features remain functional without database constraints
 
-This project is built with .
+> ⚠️ Note: Credit bypass should never be enabled in production
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-- X.AI API (Grok model) for quiz generation
+### Local Development
 
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/33086a0b-dc74-42e0-bf4d-0baa3ad2b87a) and click on Share -> Publish.
-
-## I want to use a custom domain - is that possible?
-
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
-
-### Environment Setup
-
-1. Copy `.env.example` to `.env`:
-```sh
-cp .env.example .env
-```
-
-2. Get your API keys:
-   - HuggingFace API key from [huggingface.co/settings/tokens](https://huggingface.co/settings/tokens)
-   - Supabase credentials from your project settings
-   - X.AI API key from [X.AI dashboard](https://x.ai/dashboard)
-
-3. Update `.env` with your keys
-
-### Testing HuggingFace API Key
-
-1. After setting up your environment, start the development server:
-```sh
+```bash
+# Start development server
 pnpm dev
+
+# Run tests
+pnpm test
+
+# Build for production
+pnpm build
+
+# Preview production build
+pnpm preview
 ```
 
-2. Open your browser's developer tools (F12)
-3. Look for the console message:
-   - "HuggingFace API key is valid!" - Your key is working
-   - "API Authentication Error" - Your key needs to be checked
-
-Note: Make sure your HuggingFace API key has read access to the model
-
-### API Integration
-
-Docwiz uses the X.AI API with the Grok model for quiz generation. The API is fully compatible with the OpenAI API format, making it easy to integrate and maintain.
-
-### Configuration
-
-The API is configured in `src/config/index.ts`:
-```typescript
-export const config = {
-  ai: {
-    model: 'grok-2-1212',
-    apiKey: import.meta.env.VITE_XAI_API_KEY,
-    baseUrl: 'https://api.x.ai/v1'
-  }
-}
-```
+## 📚 API Documentation
 
 ### Quiz Generation
 
-Quizzes are generated using a structured prompt that ensures consistent formatting and high-quality questions. The system supports:
+```typescript
+// Example quiz generation
+const quiz = await generateQuiz({
+  document: File,
+  options: {
+    questionCount: 10,
+    difficulty: 'medium',
+    type: 'multiple-choice'
+  }
+});
+```
 
-- Multiple choice questions
-- Automatic answer validation
-- Context-aware question generation
-- Customizable number of options
+### Templates
+
+```typescript
+// Using quiz templates
+const template = await loadTemplate('academic');
+const quiz = await generateFromTemplate(template, document);
+```
+
+## 🤝 Contributing
+
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙋 Support
+
+- 📧 Email: support@docwiz.com
+- �� Discord: [Join our community](https://discord.gg/docwiz)
+- 📚 Documentation: [docs.docwiz.com](https://docs.docwiz.com)
+
+## 🎯 Roadmap
+
+- [ ] AI Model fine-tuning for better question generation
+- [ ] Advanced analytics dashboard
+- [ ] Custom branding options
+- [ ] API access for enterprise customers
+- [ ] Mobile app development
+- [ ] Integration with LMS platforms
+
+---
+
+Built with ❤️ by the Docwiz Team
