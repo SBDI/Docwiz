@@ -1,7 +1,7 @@
 // Centralize configuration
 export const config = {
   ai: {
-    model: 'mixtral-8x7b-32768', // Using one of Groq's available models
+    model: import.meta.env.VITE_GROQ_MODEL || 'llama3-8b-8192', // Use model from env or fallback
     apiKey: import.meta.env.VITE_GROQ_API_KEY,
     baseUrl: 'https://api.groq.com/openai/v1'
   },

@@ -147,9 +147,57 @@ export const queries = {
     saveQuiz: async (quiz: Omit<Database['public']['Tables']['quizzes']['Insert'], 'id'> & { 
       questions?: Array<Omit<Database['public']['Tables']['questions']['Insert'], 'id' | 'quiz_id'>> 
     }) => {
+      console.log('Saving quiz:', quiz);
       const { questions, ...quizData } = quiz;
 
       try {
+        // Check if we should bypass Supabase completely in development
+        const bypassCredits = import.meta.env.VITE_DEV_BYPASS_CREDITS === 'true';
+        
+        if (bypassCredits) {
+          console.warn('Development mode: Bypassing Supabase and creating local quiz');
+          
+          // Create a unique ID for the quiz
+          const bypassedQuizId = crypto.randomUUID();
+          
+          // Create mock quiz data with the same structure as a real quiz
+          const mockQuizData: Database['public']['Tables']['quizzes']['Row'] & {
+            questions: Database['public']['Tables']['questions']['Row'][]
+          } = {
+            id: bypassedQuizId,
+            user_id: quizData.user_id,
+            title: quizData.title,
+            description: quizData.description || null,
+            is_public: quizData.is_public || false,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            questions: questions?.map((q, index) => ({
+              id: crypto.randomUUID(),
+              quiz_id: bypassedQuizId,
+              type: q.type,
+              question: q.question,
+              options: q.options || null,
+              correct_answer: q.correct_answer,
+              explanation: q.explanation || null,
+              order_index: index,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            })) || []
+          };
+          
+          // Store the mock quiz in localStorage for persistence during development
+          try {
+            const mockQuizzes = JSON.parse(localStorage.getItem('mockQuizzes') || '{}');
+            mockQuizzes[bypassedQuizId] = mockQuizData;
+            localStorage.setItem('mockQuizzes', JSON.stringify(mockQuizzes));
+          } catch (e) {
+            console.warn('Failed to store mock quiz in localStorage:', e);
+          }
+          
+          return mockQuizData;
+        }
+
+        // If not bypassing, proceed with actual Supabase call
         // First, try to insert the quiz without selecting
         const { error: insertError } = await supabase
           .from('quizzes')
@@ -162,53 +210,7 @@ export const queries = {
         if (insertError) {
           // Check specifically for insufficient credits error
           if (insertError.message.includes('Insufficient credits')) {
-            const bypassCredits = import.meta.env.VITE_DEV_BYPASS_CREDITS === 'true';
-            
-            if (bypassCredits) {
-              console.warn('Credit check bypassed for development');
-              
-              // For development: Bypass credit check and create quiz anyway
-              // Create a unique ID for the quiz
-              const bypassedQuizId = crypto.randomUUID();
-              
-              // Create mock quiz data with the same structure as a real quiz
-              const mockQuizData: Database['public']['Tables']['quizzes']['Row'] & {
-                questions: Database['public']['Tables']['questions']['Row'][]
-              } = {
-                id: bypassedQuizId,
-                user_id: quizData.user_id,
-                title: quizData.title,
-                description: quizData.description || null,
-                is_public: quizData.is_public || false,
-                created_at: new Date().toISOString(),
-                updated_at: new Date().toISOString(),
-                questions: questions?.map((q, index) => ({
-                  id: crypto.randomUUID(),
-                  quiz_id: bypassedQuizId,
-                  type: q.type,
-                  question: q.question,
-                  options: q.options || null,
-                  correct_answer: q.correct_answer,
-                  explanation: q.explanation || null,
-                  order_index: index,
-                  created_at: new Date().toISOString(),
-                  updated_at: new Date().toISOString()
-                })) || []
-              };
-              
-              // Store the mock quiz in localStorage for persistence during development
-              try {
-                const mockQuizzes = JSON.parse(localStorage.getItem('mockQuizzes') || '{}');
-                mockQuizzes[bypassedQuizId] = mockQuizData;
-                localStorage.setItem('mockQuizzes', JSON.stringify(mockQuizzes));
-              } catch (e) {
-                console.warn('Failed to store mock quiz in localStorage:', e);
-              }
-              
-              return mockQuizData;
-            } else {
-              throw new Error('Unable to create quiz: You have insufficient credits. Please purchase more credits to continue.');
-            }
+            throw new Error('Unable to create quiz: You have insufficient credits. Please purchase more credits to continue.');
           }
           throw insertError;
         }
