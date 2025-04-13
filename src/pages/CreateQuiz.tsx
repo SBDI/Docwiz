@@ -19,9 +19,9 @@ import { useQuiz } from "@/hooks/useQuiz";
 import { DocumentParser } from '@/lib/documentParser';
 import { FileUpload } from '@/components/quiz/FileUpload';
 import type { Question } from '@/types/quiz';
-import { 
-  QUESTION_TYPES, 
-  QUESTION_TYPE_LABELS, 
+import {
+  QUESTION_TYPES,
+  QUESTION_TYPE_LABELS,
   DIFFICULTY_LEVELS,
   LANGUAGES,
   type QuestionType,
@@ -34,7 +34,7 @@ export default function CreateQuiz() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { saveQuiz } = useQuiz();
-  
+
   const [contentType, setContentType] = useState<'Topic' | 'Text' | 'PDF'>('Topic');
   const [content, setContent] = useState("");
   const [numQuestions, setNumQuestions] = useState("5");
@@ -49,18 +49,18 @@ export default function CreateQuiz() {
   const handleFileUpload = async (file: File) => {
     try {
       if (!DocumentParser.isSupported(file)) {
-        throw new Error('Unsupported file type. Please upload a DOCX file.');
+        throw new Error('Unsupported file type. Please upload a PDF or DOCX file.');
       }
 
       setIsLoading(true);
       const parsedDoc = await DocumentParser.parseDocument(file);
-      
+
       if (parsedDoc.error) {
         throw new Error(parsedDoc.error);
       }
 
       setContent(parsedDoc.content);
-      
+
     } catch (error) {
       toast({
         title: "Error",
@@ -86,7 +86,7 @@ export default function CreateQuiz() {
     try {
       // Sanitize and prepare content
       const sanitizedContent = content.trim();
-      
+
       const questions = await aiClient.generateQuiz(sanitizedContent, {
         language,
         questionType,
@@ -119,13 +119,13 @@ export default function CreateQuiz() {
         };
 
         const savedQuiz = await saveQuiz(quizData);
-        
+
         toast({
           title: "Success",
           description: "Quiz generated and saved successfully!",
         });
 
-        navigate(`/quiz/${savedQuiz.id}`, { 
+        navigate(`/quiz/${savedQuiz.id}`, {
           replace: true,
           state: { quiz: savedQuiz }
         });
@@ -160,7 +160,7 @@ export default function CreateQuiz() {
     <div className="container max-w-2xl mx-auto py-8 space-y-8">
       <div className="space-y-4">
         <h1 className="text-2xl font-bold">Create Quiz</h1>
-        
+
         <div className="space-y-2">
           <label className="text-sm font-medium">Select Content Type</label>
           <div className="flex gap-2">
@@ -187,7 +187,7 @@ export default function CreateQuiz() {
 
         {contentType === 'PDF' ? (
           <div className="space-y-2">
-            <label className="text-sm font-medium">Upload Document</label>
+            <label className="text-sm font-medium">Upload Document (PDF or DOCX)</label>
             <FileUpload onFileSelect={handleFileUpload} />
           </div>
         ) : (

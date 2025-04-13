@@ -1,5 +1,6 @@
-import { PDFDocument } from 'pdf-lib';
 import mammoth from 'mammoth';
+import pdf2md from '@opendocsg/pdf2md';
+import { Buffer } from './node-polyfills';
 
 export interface ParsedDocument {
   content: string;
@@ -10,6 +11,7 @@ export interface ParsedDocument {
   textDirection?: 'ltr' | 'rtl';
   metadata?: Record<string, string>;
   error?: string;
+  markdown?: string; // Added for markdown conversion
 }
 
 export class DocumentParser {
@@ -27,7 +29,7 @@ export class DocumentParser {
     if (arabicPattern.test(text)) {
       return 'ar';
     }
-    
+
     // Default to English
     return 'en';
   }
@@ -46,21 +48,26 @@ export class DocumentParser {
     return metadata;
   }
 
+  /**
+   * Parses a PDF file and extracts its content as text
+   * @param file The PDF file to parse
+   * @returns A ParsedDocument object with the extracted content
+   */
   static async parsePDF(file: File): Promise<ParsedDocument> {
     try {
       const arrayBuffer = await file.arrayBuffer();
-      const pdfDoc = await PDFDocument.load(arrayBuffer);
-      const pageCount = pdfDoc.getPageCount();
-      
-      // Extract text from each page with better formatting
-      const pages = [];
-      for (let i = 0; i < pageCount; i++) {
-        const page = pdfDoc.getPage(i);
-        const text = await page.getText();
-        pages.push(text.trim());
-      }
+      const buffer = Buffer.from(arrayBuffer);
 
-      const content = pages.join('\n\n');
+      // Use pdf2md to extract text and convert to markdown
+      const markdown = await pdf2md(buffer);
+
+      // Use the markdown content as the text content as well
+      // This gives us better text extraction than trying to parse it ourselves
+      const content = markdown.replace(/[#*_`\[\]]/g, ''); // Remove markdown formatting for plain text
+
+      // Estimate page count (rough estimate)
+      const pageCount = Math.ceil(content.length / 3000); // Assume ~3000 chars per page
+
       const language = this.detectLanguage(content);
       const textDirection = this.detectTextDirection(content);
       const metadata = await this.extractMetadata(file);
@@ -72,16 +79,47 @@ export class DocumentParser {
         type: 'pdf',
         language,
         textDirection,
-        metadata
+        metadata,
+        markdown
       };
     } catch (error) {
       console.error('Error parsing PDF:', error);
+      let errorMessage = 'Failed to parse PDF document';
+
+      if (error instanceof Error) {
+        errorMessage = `PDF parsing error: ${error.message}`;
+        // Add more context for specific errors
+        if (error.message.includes('password')) {
+          errorMessage += '. The PDF may be password protected.';
+        } else if (error.message.includes('corrupt')) {
+          errorMessage += '. The PDF file may be corrupted.';
+        }
+      }
+
       return {
         content: '',
         title: file.name,
         type: 'pdf',
-        error: error instanceof Error ? error.message : 'Failed to parse PDF document'
+        error: errorMessage
       };
+    }
+  }
+
+  /**
+   * Converts a PDF file to Markdown format
+   * @param arrayBuffer The PDF file as an ArrayBuffer
+   * @returns A promise that resolves to the Markdown string
+   */
+  static async convertPdfToMarkdown(arrayBuffer: ArrayBuffer): Promise<string> {
+    try {
+      // Convert ArrayBuffer to Buffer for pdf2md
+      const buffer = Buffer.from(arrayBuffer);
+
+      // Use pdf2md to convert the PDF to Markdown
+      return await pdf2md(buffer);
+    } catch (error) {
+      console.error('Error converting PDF to Markdown:', error);
+      throw new Error(`Failed to convert PDF to Markdown: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 
@@ -146,7 +184,7 @@ export class DocumentParser {
       }
 
       const fileType = file.type.toLowerCase();
-      
+
       // Handle text-based files
       if (fileType.startsWith('text/')) {
         return this.parsePlainText(file);
@@ -177,9 +215,10 @@ export class DocumentParser {
 
   static isSupported(file: File): boolean {
     const fileType = file.type.toLowerCase();
-    return fileType in this.SUPPORTED_TYPES || 
+    return fileType in this.SUPPORTED_TYPES ||
            fileType.startsWith('text/') ||
            file.name.endsWith('.txt') ||
-           file.name.endsWith('.md');
+           file.name.endsWith('.md') ||
+           file.name.endsWith('.pdf');
   }
 }

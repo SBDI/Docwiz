@@ -1,3 +1,6 @@
+// Import Node.js polyfills first
+import './lib/node-polyfills';
+
 import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'

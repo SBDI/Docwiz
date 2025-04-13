@@ -2,7 +2,8 @@ import React, { useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { StoredDocument } from '@/lib/documentStorage';
 import { Progress } from '@/components/ui/progress';
-import { FileText, Upload, X } from 'lucide-react';
+import { FileText, Upload, X, FileDown } from 'lucide-react';
+import { DocumentParser } from '@/lib/documentParser';
 
 interface FileUploadProps {
   onFileSelect: (file: File) => void;
@@ -15,6 +16,8 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFileSelect, savedDocum
   const [uploadProgress, setUploadProgress] = useState(0);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [isConverting, setIsConverting] = useState(false);
+  const [markdown, setMarkdown] = useState<string | null>(null);
 
   const handleClick = () => {
     fileInputRef.current?.click();
@@ -22,7 +25,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFileSelect, savedDocum
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file && file.name.endsWith('.docx')) {
+    if (file && (file.name.endsWith('.docx') || file.name.endsWith('.pdf'))) {
       setSelectedFile(file);
       simulateUpload(file);
     }
@@ -32,7 +35,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFileSelect, savedDocum
     event.preventDefault();
     setIsDragging(false);
     const file = event.dataTransfer.files[0];
-    if (file && file.name.endsWith('.docx')) {
+    if (file && (file.name.endsWith('.docx') || file.name.endsWith('.pdf'))) {
       setSelectedFile(file);
       simulateUpload(file);
     }
@@ -48,7 +51,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFileSelect, savedDocum
     setIsDragging(false);
   };
 
-  const simulateUpload = (file: File) => {
+  const simulateUpload = async (file: File) => {
     setUploadProgress(0);
     const duration = 1000; // 1 second upload simulation
     const interval = 50; // Update every 50ms
@@ -62,6 +65,12 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFileSelect, savedDocum
 
       if (progress === 100) {
         clearInterval(timer);
+
+        // If it's a PDF file, automatically convert to markdown
+        if (file.name.endsWith('.pdf')) {
+          handleConvertToMarkdown(file);
+        }
+
         onFileSelect(file);
       }
     }, interval);
@@ -70,9 +79,46 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFileSelect, savedDocum
   const clearFile = () => {
     setSelectedFile(null);
     setUploadProgress(0);
+    setMarkdown(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
+  };
+
+  const handleConvertToMarkdown = async (fileToConvert: File = null) => {
+    const fileToUse = fileToConvert || selectedFile;
+    if (!fileToUse || !fileToUse.name.endsWith('.pdf')) {
+      return;
+    }
+
+    try {
+      setIsConverting(true);
+      const arrayBuffer = await fileToUse.arrayBuffer();
+      const markdown = await DocumentParser.convertPdfToMarkdown(arrayBuffer);
+      setMarkdown(markdown);
+    } catch (error) {
+      console.error('Error converting to Markdown:', error);
+      // Don't show alert for automatic conversion
+      if (!fileToConvert) {
+        alert('Failed to convert PDF to Markdown. Please try again.');
+      }
+    } finally {
+      setIsConverting(false);
+    }
+  };
+
+  const downloadMarkdown = () => {
+    if (!markdown || !selectedFile) return;
+
+    const blob = new Blob([markdown], { type: 'text/markdown' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = selectedFile.name.replace('.pdf', '.md');
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   };
 
   return (
@@ -90,9 +136,9 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFileSelect, savedDocum
         type="file"
         className="hidden"
         onChange={handleFileChange}
-        accept=".docx"
+        accept=".docx,.pdf"
       />
-      
+
       {!selectedFile ? (
         <div className="flex flex-col items-center gap-4">
           <div className="p-3 rounded-full bg-gray-50">
@@ -100,7 +146,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFileSelect, savedDocum
           </div>
           <div className="text-gray-600">
             <p className="font-medium">Drop your document here or click to browse</p>
-            <p className="text-sm text-gray-400">Only DOCX files are supported</p>
+            <p className="text-sm text-gray-400">PDF and DOCX files are supported</p>
           </div>
         </div>
       ) : (
@@ -126,6 +172,34 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFileSelect, savedDocum
           <p className="text-xs text-gray-500">
             {uploadProgress < 100 ? 'Uploading...' : 'Upload complete'}
           </p>
+
+          {/* PDF to Markdown download option */}
+          {selectedFile && selectedFile.name.endsWith('.pdf') && uploadProgress === 100 && (
+            <div className="mt-2 space-y-2">
+              {isConverting && (
+                <div className="flex items-center justify-center gap-1 text-xs text-gray-500">
+                  <svg className="animate-spin h-3 w-3 mr-1" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                  Converting to Markdown...
+                </div>
+              )}
+              {markdown && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full text-xs"
+                  onClick={downloadMarkdown}
+                >
+                  <span className="flex items-center gap-1">
+                    <FileDown className="h-3 w-3" />
+                    Download Markdown
+                  </span>
+                </Button>
+              )}
+            </div>
+          )}
         </div>
       )}
     </div>
